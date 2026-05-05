@@ -1,0 +1,6 @@
+haowenX -- 2026-04-30 11:35
+Wipe box NO
+Serve multiple apps concurrently? NO
+Flask
+Provisioned SSL certificates to facilitate httpS traffic? NO
+Will do SSL certification when arriving home
