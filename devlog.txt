@@ -4,3 +4,14 @@ Serve multiple apps concurrently? NO
 Flask
 Provisioned SSL certificates to facilitate httpS traffic? NO
 Will do SSL certification when arriving home
+
+haowenX -- 2026-05-04 11:41
+Registered name.com
+forced everyone in group to register domains and post materials in docs
+forced them to run the security patch
+Created docs and socials
+
+haowenX -- 2026-05-05
+Covered all name.com
+Having trouble with backup server, but will fix
+Design doc greatly improved, with new ideas and new APIs, etc
