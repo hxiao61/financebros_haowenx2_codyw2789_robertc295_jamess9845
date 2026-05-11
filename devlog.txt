@@ -24,5 +24,8 @@ haowenX -- 2026-05-08
 Fixed a back end error involving a pytorch prediction
 Working on design doc, implemented
 
-codyW -- 2026-05-08
-- Revamped that desing document
+codyW -- 2026-05-08 2:46
+- Revamped that desing document.
+- I have cancer doing this desing document.
+- The demo too I tried to do but I used another method. 
+
