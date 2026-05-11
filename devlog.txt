@@ -23,3 +23,6 @@ Worked on design doc about what we will be doing
 haowenX -- 2026-05-08
 Fixed a back end error involving a pytorch prediction
 Working on design doc, implemented
+
+codyW -- 2026-05-08
+- Revamped that desing document
