@@ -32,3 +32,6 @@ codyW -- 2026-05-08 2:46
 robertC -- 2026-05-11  11:45
 - Submitted design docs
 - reviewed design docs
+
+jamesS -- 2026-05-12 11:15
+- added the WORKING flask prototype for ML model predictions (responses are fed through terminal with curl command)
