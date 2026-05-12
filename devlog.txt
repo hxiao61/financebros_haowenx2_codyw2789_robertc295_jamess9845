@@ -11,7 +11,34 @@ forced everyone in group to register domains and post materials in docs
 forced them to run the security patch
 Created docs and socials
 
-haowenX -- 2026-05-05
+haowenX -- 2026-05-05 11:42
 Covered all name.com
 Having trouble with backup server, but will fix
 Design doc greatly improved, with new ideas and new APIs, etc
+
+haowenX -- 2026-05-07 17:20
+Converged today on what we will be doing and implemented ideas into design doc
+Worked on design doc about what we will be doing
+
+haowenX -- 2026-05-08
+Fixed a back end error involving a pytorch prediction
+Working on design doc, implemented
+
+codyW -- 2026-05-08 2:46
+- Revamped that desing document.
+- I have cancer doing this desing document.
+- The demo too I tried to do but I used another method. 
+
+robertC -- 2026-05-11  11:45
+- Submitted design docs
+- reviewed design docs
+
+jamesS -- 2026-05-12 11:15
+- added the WORKING flask prototype for ML model predictions (responses are fed through terminal with curl command)
+
+robertC -- 2026-05-12 11:33
+- edited design doc
+
+codyW -- 2026-05-12 11:34
+- Working on a new design document
+- Working on new chart.js deployment example for showcasting our Ml model forcasting.
