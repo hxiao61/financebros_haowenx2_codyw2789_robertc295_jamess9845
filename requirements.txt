@@ -1,0 +1,4 @@
+flask
+numpy
+yfinance
+scikit-learn
