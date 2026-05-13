@@ -46,3 +46,8 @@ codyW -- 2026-05-12 11:34
 haowenX -- 2026-05-13 1:05
 - Finished and revised design doc.
 - in my opinion the PERFECT design doc
+
+Cody Wong -- 2026-05-13 2:37
+- Built a working Flask + Chart.js prediction demo pag
+- Integrated yfinance data retrieval and visualized predictions vs actual prices.
+- Added quick ticker demo buttons (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA).
