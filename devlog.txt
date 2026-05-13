@@ -47,7 +47,33 @@ haowenX -- 2026-05-13 1:05
 - Finished and revised design doc.
 - in my opinion the PERFECT design doc
 
-Cody Wong -- 2026-05-13 2:37
+codyW -- 2026-05-13 2:37
 - Built a working Flask + Chart.js prediction demo pag
 - Integrated yfinance data retrieval and visualized predictions vs actual prices.
 - Added quick ticker demo buttons (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA).
+
+haowenX -- 2026-05-13 5:43
+Python style (PEP 8):
+The most applicable of PEP 8 to our codebase were naming conventions and inline comments.
+Our ML code has a lot of math and logic that isn't obvious at first glance, so without ocmments
+a teammate would have no idea what's going on. PEP 8 was saying someone else will read your code
+and they need to understand it fast\
+We mostly appreciated the inline comments because James wrote the ML code and the rest of us had
+to read it (we don't know much about ML) and the comments saved a lot of time explaining what each
+part does
+- imports are all at the top before any code (app/app.py lines 1-5)
+- inline comments explaining logic like sliding window (app/proto/prototype.py line 18)
+- going forward, we will be using comments as well as our docs to share information so no one is confused
+on how the code works
+JavaScript style (MDN):
+Most applicable of MDN for us is camelCase. Cody's code currently is consistent and
+I think we will stick with it. MDN says to stop debating whitespace and just write consistent code, which
+is what we did with the chart.js frontend. As we write the AI panel as well as more chart pages we
+will cary the same style
+We appreciated the variable names and consistency as everyone could read it right away
+without having to ask what any of it is or does.
+-camelCase and const that doesn't change, let only when it gets 
+reassigned (app/templates/demo.html 42-47)
+- async for API calls (/app/templates/demo.html 132)
+
+- Revised structure of repo, will need to speak to members about apps
