@@ -42,3 +42,7 @@ robertC -- 2026-05-12 11:33
 codyW -- 2026-05-12 11:34
 - Working on a new design document
 - Working on new chart.js deployment example for showcasting our Ml model forcasting.
+
+haowenX -- 2026-05-13 1:05
+- Finished and revised design doc.
+- in my opinion the PERFECT design doc

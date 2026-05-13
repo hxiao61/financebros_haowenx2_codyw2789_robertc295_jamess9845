@@ -1,40 +1,41 @@
-# System Blueprint (_a.k.a._ "Design Doc")
+# System Blueprint
 
-## TNPG: 
-## project:
-## Target ship date: {2026-06-xx}
+**TNPG**: financebros
+**Project**: Blossomberg Terminal
+**Target ship date**: 2026-06-01
 
 ---
 
-#### roster:
-
+#### Roster:
 
 | Name | Email | Primary Role | Secondary Role |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Haowen Xiao | haowenx2@nycstudents.net | Frontend, UI, Overall Infrastructure | Project Manager, deployment |
+| Cody Wong | codyw2789@nycstudents.net | SQLite, API integration | Stock datasets, backend |
+| Robert Chen | robertc295@nycstudents.net | Flask, routing, sessions | Authentication, portfolio pages, |
+| James Sun | jamess9845@nycstudents.net | Machine learning, AI integration, models | Forecast, Prediction, Review |
 
 ---
 
-
 # Summary
-{Keep it tight. Concise. 1 sentence. Really need more? 3 max.}
+
+Blossomberg terminal is a simpled-down and modernized clone of the Bloomberg Terminal that uses live stock data, charts, and ML forecasting with an AI analysis layer for market exploration and learning
 
 ## Problem Being Solved
 
+The real Bloomberg Terminal costs almost $25,000 / year and has a UI that was built in 1980s that is very intimidating for beginners. Retail traders and students who want to learn can use this to learn more about stocks and other features of the stock market before deciding if they need a full Bloomberg terminal.
 
 ## Target Users
 
 Who will use this system?
 
-- ____________________________________
-- ____________________________________
-
+- Stock traders
+- Aspiring Students learning finance
+- Retail / hobby investors ("finance bros")
 
 ## Why This Project Matters
 
+This project matters because Bloomberg can be both very overwhelming and expensive to a normal user or someone who wants to get into this type of learning. We hope that this project can help students learn but also for professionals to use for their day to day lives.
 
 ---
 
@@ -42,20 +43,27 @@ Who will use this system?
 
 ## Core Features (Required for Final Submission)
 Features that **must** be completed:
-1. 
-1. 
-1. 
+- Stock data pulling live and historical prices from Yahoo Finance API or cached in SQLite
+- Dashboard with searchable stock tickers, growth charts, comparison graphs, and volume charts using Chart.js
+- ML forecast page using Scikit-learn regression models trained on the FAANG historical dataset. Predicts graphs and has confidence intervals
+- Portfolio / watchlist system letting users save tickers to their account and view their performance
+- AI Analysis panel using OpenRouter that answers questions like "Why did NVDA rise today?"
 
 ## Stretch Features (Only if MVP is Complete)
-1. 
-1. 
-1. 
+- Candlestick and line graphs
+- Simulated portfolio with paper trading
+- Sector and index heatmap
+- Email/alert system for prices
 
 ## Explicit Non-Goals
 
-Features intentionally excluded:
-- 
-- 
+- Personally learn more about the FinTech industry
+- Learn more about stocks and equations used
+
+### Features intentionally excluded:
+- Real-money trading or integration of any kind
+- Tick-by-tick streaming data
+- Options, futures, crypto, forex
 
 ---
 
@@ -63,88 +71,273 @@ Features intentionally excluded:
 
 | Layer | Selected Tool |
 |---|---|
-| Backend Framework | Flask / Node.js (choose one) |
-| Frontend Framework | none / bootstrap / foundation / tailwind / other? (seek clearance) |
-| Database | SQLite / MongoDB |
-| Authentication | Flask sessions unless you have good reason/need to deviate |
-| ORM / DB Library | optionally SQLAlchemy; initiate clearance protocol if interested |
+| Backend Framework | Flask |
+| Frontend Framework | TailwindCSS, JavaScript |
+| Database | SQLite |
+| Authentication | Flask sessions |
+| ORM / DB Library | N/A |
+| Data Visualization | Chart.js |
+| Machine Learning | Sci-kit-Learn; PyTorch as stretch |
+| Market Data | yFinance, FAANG historical zip from Kaggle, Alpaca (optional) |
+| AI | OpenRouter API, OpenAI API |
 
 ## Why This Stack Was Chosen
-{your summary/recap of team discussions here}
+
+Flask is what everyone has been using since day; it works well and fulfills our goals for this project. SQLite is sufficient because the data is mostly cached and we won't be modifying the data, we also don't need to deploy MongoDB. We decided to go with TailwindCSS because it is the most customizable and easiest to work with for building a dashboard, and Chart.js is the best option for our needs for graphs, comparisons, volume visualizations, and maybe candlesticks as if we finish the MVP. OpenRouter was chosen for the AI layer because it gives us access to multiple LLM providers without separate billing, and the student pack credits make it free for this project.
 
 ---
 
 # Team Ownership Plan
 
-Each member must own meaningful deliverables.
-
 | Team Member | Primary Ownership | Secondary Ownership | Specific Deliverables |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Haowen Xiao | Frontend, UI Infrastructure | Project Management, Deployment | Build dashboard UI, implement navigation/layout, integrate charts, and manage deployment setup |
+| Cody Wong | SQLite, API integration | Stock datasets, backend | Set up SQLite database, integrate stock APIs, cache historical data, and manage backend data flow |
+| Robert Chen | Flask, routing, sessions | Authentification, Portfolio pages | Build Flask routes, manage user sessions/login system, and develop portfolio/watchlist pages |
+| James Sun | ML forecasting system, AI integration | Flask backend support, analytics features | Train and evaluate Sk-learn models using stock data from yFinance, packaging model weights and integrating into Flask app to create prediction-vs-actual comparison charts. |
 
 ---
 
 # Component map
 
-{Insert your mermaid(or equivalent)-generated diagram here}
+![Component Map](design/componentmap.png)
 
 # Site map
 
-{Insert your mermaid(or equivalent)-generated diagram here}
-eg...
-```
-Landing Page
-   ↓
-Login / Register
-   ↓
-Dashboard
-   ├── Feature A
-   ├── Feature B
-   └── Profile
-```
+![Site Map](design/sitemap.png)
 
 ## Key User Stories
-### eg0
-As a __________, I want to __________ so that...
 
-### eg1
-As a __________, I want to __________ so that...
+### Day-trading retail investor
+As a retail investor who actively trades during market hours, I want to pull up a ticker, see its growth and make a decision. I want to use an AI-generated explanation of recent movement or any recent news that comes up so I can make a more informed decision without leaving the dashboard.
 
-### eg2
-As a __________, I want to __________ so that...
+### Aspiring finance student
+As an aspiring finance student who wants to learn how the market works, I want to compare two equities side by side and see a prediction with a confidence interval, so that I can build my knowledge for how prices move and what models predict before risking real money
 
+### Hobbyist with a watchlist
+As a hobbyist tracking a handful of my stocks, I want to save my tickers to a watchlist tied to my account and see their performance, so that I can monitor their performances all in one session and don't need multiple websites to track their performances and other relevant data.
 
+---
 
 # Database Design
 
-{Insert your table/document organizational structure here}
+| Table Name | Purpose |
+|---|---|
+| `users` | Stores user account information for login and sessions |
+| `watchlist` | Stores the stock tickers each user saves |
+| `stock_cache` | Stores cached stock price data pulled from yFinance |
+| `portfolio` | Stores simulated user holdings for tracked stocks |
+| `ai_queries` | Stores recent AI analysis questions and answers |
+| `ml_predictions` | Stores ML forecast results for selected stocks |
 
+### USERS
+
+| Type | Field | Description |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique user ID |
+| TEXT UNIQUE | username | User login name |
+| TEXT UNIQUE | password | User password |
+
+### WATCHLIST
+
+| Type | Field | Description |
+|---|---|---|
+| INTEGER PRIMARY KEY | ID | Unique watchlist item id |
+| INTEGER | User_id | Links to user id |
+| TEXT | Ticker | Saved stock ticker |
+
+### stock_cashe
+
+| Type | Field | Description |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique stock data row |
+| TEXT | ticker | Stock ticker symbol |
+| DATE | date | Trading date |
+| REAL | open | Opening price |
+| REAL | high | Highest price |
+| REAL | low | Lowest price |
+| REAL | close | Closing price |
+| INTEGER | volume | Trading volume |
+
+### Portfolio
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique portfolio entry |
+| INTEGER | user_id | Links to users.id |
+| TEXT | ticker | Stock ticker owned |
+| REAL | shares | Number of shares |
+| REAL | avg_price | Average purchase price |
+| DATETIME | created_at | Time holding was added |
+
+### AI_QUERIES
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique AI query ID |
+| INTEGER | user_id | Links to user.id |
+| TEXT | ticker | Related stock ticker |
+| TEXT | question | User's question |
+| TEXT | answer | ai -generated response |
+| DATETIME | created_at | TIme question was asked |
+
+### ML_predictions
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | ID | Unique prediction ID |
+| TEXT | ticker | Stock ticker |
+| DATE | prediction_date | Date prediction was made |
+| DATE | target_date | Date was being predicted |
+| REAL | predicted_price | ML-predicted stock price |
+
+---
 
 # Testing Plan
-{Delineate here your plan for testing each component}
+
+**Stock Data API**
+- What to Test: Ticker search, live prices, historical prices
+- Testing Method: Test with common tickers like AAPL, NVDA, TSLA, and invalid tickers
+- Success Criteria: Correct data loads without crashing, invalid tickers show an error message
+
+**SQLite Database**
+- What to Test: Users, watchlists, cached stock data, predictions
+- Testing Method: Add, update, delete, and retrieve sample records
+- Success Criteria: Data saves correctly and can be retrieved after refreshing
+
+**Flask Routes**
+- What to Test: Page routing and backend API endpoints
+- Testing Method: Manually visit each route and test API responses
+- Success Criteria: All routes load correctly and return expected data
+
+**Authentication**
+- What to Test: Login, logout, user sessions
+- Testing Method: Create test accounts and try valid/invalid logins
+- Success Criteria: Users stay logged in correctly and cannot access private pages when logged out
+
+**Dashboard UI**
+- What to Test: Layout, stock search, charts, responsiveness
+- Testing Method: Test on desktop and smaller browser widths
+- Success Criteria: UI is readable, organized, and does not break on resize
+
+**Chart.js Visualizations**
+- What to Test: Price charts, comparison graphs, volume charts
+- Testing Method: Compare displayed chart data with backend data
+- Success Criteria: Charts match the correct ticker data and update when users search
+
+**Watchlist / Portfolio**
+- What to Test: Save tickers, remove tickers, view performance
+- Testing Method: Add and remove sample tickers from a test account
+- Success Criteria: Saved tickers stay attached to the correct user
+
+**ML Forecasting**
+- What to Test: Prediction output, prediction-vs-actual chart
+- Testing Method: Run model on historical yFinance data and compare output format
+- Success Criteria: Forecast loads, graph displays correctly, and model does not crash
+
+**AI Analysis Panel**
+- What to Test: User questions and AI stock explanations
+- Testing Method: Ask sample questions like "Why did NVDA rise today?"
+- Success Criteria: AI returns relevant explanations and handles missing data gracefully
+
+**Error Handling**
+- What to Test: Invalid inputs, API failures, empty results
+- Testing Method: Test fake tickers, bad login info, and disconnected API cases
+- Success Criteria: App shows clear error messages instead of crashing
+
+**Final Integration**
+- What to Test: Full user flow across the app
+- Testing Method: Login, search stock, view chart, save watchlist, run forecast, ask AI question
+- Success Criteria: Full workflow works smoothly from start to finish
+
+---
 
 # Timeline
-## Week 1 Goals:
-## Week 2 Goals:
-## Week 3 Goals:
-## Internal Deadlines:
-{List milestones your team has identified, in the order they must be completed. Set a target completion date for each.}
 
+## Week 1 Goals:
+- Create GitHub repository and organize overall project structure
+- Set up Flask backend framework and routing system
+- Create SQLite database tables and schema
+- Integrate yFinance APIs for live and historical stock data
+- Design starter dashboard UI using TailwindCSS
+- Set up Flask sessions and backend infrastructure
+- Research and preprocess FAANG historical datasets for ML forecasting
+- Ensure the application runs locally with working routes and stock data retrieval
+
+## Week 2 Goals:
+- Build dashboard interface and responsive layouts
+- Implement stock search functionality
+- Create Chart.js price, comparison, and volume charts
+- Develop login/logout system and authentication flow
+- Build watchlist and portfolio pages
+- Implement stock data caching system
+- Train and test Scikit-learn forecasting models
+- Begin connecting ML prediction outputs to the Flask backend
+- Ensure users can search stocks, view charts, and save watchlists
+
+## Week 3 Goals:
+- Integrate ML forecasts into frontend prediction charts
+- Build AI analysis panel using OpenRouter/OpenAI APIs
+- Improve dashboard styling and responsiveness
+- Perform backend integration and API reliability testing
+- Fix bugs and optimize application performance
+- Conduct full end-to-end testing across all components
+- Prepare deployment and production setup
+- Finalize presentation, documentation, and demo materials
+- Complete final polishing before the June 1 submission deadline
+
+## Internal Deadlines:
+- **May 15:** Complete Flask app structure, GitHub repository setup, and overall project organization.
+- **May 17:** Finish SQLite database tables and backend data structure.
+- **May 18:** Complete yFinance API integration and stock data caching system.
+- **May 20:** Finish dashboard UI, stock search, and Chart.js visualizations.
+- **May 22:** Complete authentication, sessions, and portfolio/watchlist pages.
+- **May 25:** Train and integrate ML forecasting models into the Flask app.
+- **May 27:** Finish AI analysis panel integration using OpenRouter/OpenAI APIs.
+- **May 29:** Complete full MVP integration and core feature testing.
+- **May 31:** Finish bug fixes, UI polishing, deployment setup, and final presentation preparation.
+- **June 1:** Final project submission and deployment.
+
+---
 
 # Completion Criteria (_a.k.a._ "Definition of 'Done'")
 Project is considered complete when all of the following are true:
-1.
-1.
-1.
+- All MVP features (auth, dashboard, stock viewer, forecast, portfolio/watchlist, AI analysis, relevant equations) are implemented and reachable by navbar
+- Frontend, Flask backend, and SQLite database are fully integrated
+- ML forecast page returns predictions for any of the FAANG tickers with a confidence interval
+- AI Analysis returns a LLM-generated response to at least 3 test prompts
+- App served on financebros.app
+
+---
 
 # Open Questions
-{Delineate anything undecided here}
+
+- Do we want OpenRouter to call a specific LLM by default or allow users to choose between different models?
+- Should ML forecasts predict only next-day prices or support multi-day forecasting?
+- Do we want cached stock data to refresh automatically on a timer or only when requested?
+- Should the watchlist and portfolio system support simulated profit/loss tracking?
+- Do we want to support candlestick charts if the MVP is completed early?
+- Should AI analysis responses include links/news sources or only generated summaries?
+- Do we want guest access without login for basic stock searching and charts?
+- How much historical stock data should be stored locally in SQLite before clearing old cache entries?
+- Should the application prioritize desktop dashboard layouts or mobile responsiveness first?
+- Do we want to deploy locally only or fully host the project online for public access?
+
+---
 
 # Appendix
-{Any relevant info that is useful but would have interrupted narrative flow above, or cluttered the information portrayed}
+
+- Bloomberg Terminal pricing is estimated at approximately $25,000 per year, which creates a large accessibility barrier for students and beginner investors.
+- Historical FAANG stock datasets from Kaggle may be combined with live yFinance data to improve ML forecasting accuracy.
+- OpenRouter was selected because it supports multiple LLM providers under one API and includes student developer credits.
+- SQLite was chosen over MongoDB/PostgreSQL because the project mainly reads cached data and does not require large-scale concurrent writes.
+- Chart.js was selected because it is lightweight, easy to integrate with Flask, and supports line graphs, comparison charts, and volume visualizations needed for the MVP.
+- The project intentionally excludes real-money trading, cryptocurrency trading, options trading, and high-frequency live market streaming to keep the scope manageable.
+- Stretch goals such as paper trading, heatmaps, and candlestick charts will only be implemented if all MVP functionality is stable before the deadline.
+- The project is intended primarily for educational and learning purposes rather than professional financial advising or investment management.
+
+---
 
 # Other
-{Put here anything that did not sensibly fit under above headings. This section will inform evolution of SoftDev.}
+
+N/A
