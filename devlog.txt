@@ -77,3 +77,10 @@ reassigned (app/templates/demo.html 42-47)
 - async for API calls (/app/templates/demo.html 132)
 
 - Revised structure of repo, will need to speak to members about apps
+
+Cody Wong -- 2026-05-13 11:46 
+- working on a new demonstration with new animation for chart.js going left to right
+- working on a sqlite hard-coded database for our project
+
+Robert Chen -- 2026-05-13 11:47
+- setting up templates 
