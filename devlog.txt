@@ -87,3 +87,6 @@ robertC -- 2026-05-13 11:47
 
 robertC -- 2026-05-14 1:32
 -set up authentication
+
+codyW -- 2026-05-14 11:29
+- Continuined to work with chart.js new animation in regards to our app to make it to most modern we can. Also found out that I can take inspiration from figma templates and other websites. 
