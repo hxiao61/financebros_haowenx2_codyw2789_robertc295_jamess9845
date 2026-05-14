@@ -10,10 +10,10 @@
 
 | Name | Email | Primary Role | Secondary Role |
 |---|---|---|---|
-| Haowen Xiao | haowenx2@nycstudents.net | Frontend, UI, Overall Infrastructure | Project Manager, deployment |
-| Cody Wong | codyw2789@nycstudents.net | SQLite, API integration | Stock datasets, backend |
-| Robert Chen | robertc295@nycstudents.net | Flask, routing, sessions | Authentication, portfolio pages, |
-| James Sun | jamess9845@nycstudents.net | Machine learning, AI integration, models | Forecast, Prediction, Review |
+| Haowen Xiao | haowenx2@nycstudents.net | Frontend, UI, charts, deployment, page-layout | Project Manager, team coordination, deadlines |
+| Cody Wong | codyw2789@nycstudents.net | Database, API integration | Stock datasets, backend |
+| Robert Chen | robertc295@nycstudents.net | Backend, Flask app, routing, request handling | Authentication, portfolio pages, user accounts |
+| James Sun | jamess9845@nycstudents.net | Machine learning forecast, AI analysis | LLM integration, Review |
 
 ---
 
@@ -83,7 +83,7 @@ Features that **must** be completed:
 
 ## Why This Stack Was Chosen
 
-Flask is what everyone has been using since day; it works well and fulfills our goals for this project. SQLite is sufficient because the data is mostly cached and we won't be modifying the data, we also don't need to deploy MongoDB. We decided to go with TailwindCSS because it is the most customizable and easiest to work with for building a dashboard, and Chart.js is the best option for our needs for graphs, comparisons, volume visualizations, and maybe candlesticks as if we finish the MVP. OpenRouter was chosen for the AI layer because it gives us access to multiple LLM providers without separate billing, and the student pack credits make it free for this project.
+Flask is what everyone has been using since day 1; it works well and fits our needs since we’re mostly serving cached data and proxying API calls instead of handling a lot of backend logic. SQLite is because our dataset fits in a single file and we don’t expect many users writing to the database at the time of MVP. We decided to go with TailwindCSS because it is the most customizable and easiest to work with for building a dashboard, and Chart.js is the best option for our needs for graphs, comparisons, and volume visualizations for equities as if we finish the MVP. ~~OpenRouter was chosen for the AI layer because it gives us access to multiple LLM providers without separate billing, and the student pack credits make it free for this project.~~ (SEEKING CLEARANCE)
 
 ---
 
