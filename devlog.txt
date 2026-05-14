@@ -27,7 +27,7 @@ Working on design doc, implemented
 codyW -- 2026-05-08 2:46
 - Revamped that desing document.
 - I have cancer doing this desing document.
-- The demo too I tried to do but I used another method. 
+- The demo too I tried to do but I used another method.
 
 robertC -- 2026-05-11  11:45
 - Submitted design docs
@@ -72,18 +72,18 @@ is what we did with the chart.js frontend. As we write the AI panel as well as m
 will cary the same style
 We appreciated the variable names and consistency as everyone could read it right away
 without having to ask what any of it is or does.
--camelCase and const that doesn't change, let only when it gets 
+-camelCase and const that doesn't change, let only when it gets
 reassigned (app/templates/demo.html 42-47)
 - async for API calls (/app/templates/demo.html 132)
 
 - Revised structure of repo, will need to speak to members about apps
 
-Cody Wong -- 2026-05-13 11:46 
+codyW-- 2026-05-13 11:46
 - working on a new demonstration with new animation for chart.js going left to right
 - working on a sqlite hard-coded database for our project
 
-Robert Chen -- 2026-05-13 11:47
-- setting up templates 
+robertC -- 2026-05-13 11:47
+- setting up templates
 
-Robert chen -- 2026-5-14 1:32
+robertC -- 2026-05-14 1:32
 -set up authentication
