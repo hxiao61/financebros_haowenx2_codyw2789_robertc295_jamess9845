@@ -1,13 +1,16 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 from pathlib import Path
 import pickle
 import numpy as np
 import yfinance as yf
 import sqlite3
 
-DATABASE = "users.db"  
+DATABASE = "users.db"
 
 app = Flask(__name__)
+app.secret_key = "financebros"
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "proto" / "stock_model.pkl"
@@ -62,8 +65,8 @@ def rolling_predictions_with_model(df, model):
     return pred_dates, preds
 
 
-@app.route("/")
-def home():
+@app.route("/demo")
+def demo():
     return render_template("demo.html")
 
 
@@ -215,4 +218,5 @@ def get_dashboard_data():
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(host="127.0.0.1", port=5000, debug=True)
