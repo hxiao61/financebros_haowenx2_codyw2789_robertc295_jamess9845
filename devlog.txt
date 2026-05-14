@@ -84,3 +84,6 @@ Cody Wong -- 2026-05-13 11:46
 
 Robert Chen -- 2026-05-13 11:47
 - setting up templates 
+
+Robert chen -- 2026-5-14 1:32
+-set up authentication
