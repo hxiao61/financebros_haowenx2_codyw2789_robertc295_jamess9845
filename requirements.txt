@@ -23,7 +23,7 @@ markdown-it-py==4.2.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 multitasking==0.0.13
-numpy==2.4.4
+numpy==2.2.4
 openai==2.36.0
 pandas==3.0.3
 peewee==4.0.5
