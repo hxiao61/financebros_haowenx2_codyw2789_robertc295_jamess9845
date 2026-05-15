@@ -90,3 +90,13 @@ robertC -- 2026-05-14 1:32
 
 codyW -- 2026-05-14 11:29
 - Continuined to work with chart.js new animation in regards to our app to make it to most modern we can. Also found out that I can take inspiration from figma templates and other websites. 
+
+haowenX -- 2026-05-14 20:17
+- Timeline check:
+Originally design doc had SQLite done by May 17 and dashboard by May 20. We are actually ahead
+on some things and behind on others. Cody already has a working Chart.js prediction demo with 
+real ML models which wasn't expected until week 2. However we haven't touched the dashboard UI, 
+auth is just getting started, and SQlite database is still being set up. The ML prototype existing
+early is really good but we need to catch up on frotend before we can connect everything. We are also 
+considering not using Kaggle databse as yfinance achieves everything we need. Biggest risk right now
+is that we haven't connected everything yet.
