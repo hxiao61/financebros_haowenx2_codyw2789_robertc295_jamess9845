@@ -100,3 +100,7 @@ auth is just getting started, and SQlite database is still being set up. The ML 
 early is really good but we need to catch up on frotend before we can connect everything. We are also 
 considering not using Kaggle databse as yfinance achieves everything we need. Biggest risk right now
 is that we haven't connected everything yet.
+
+jamesS -- 2026-05-16 11:32
+- completely revamped login/register/dashboard ui + added navbar to redirect to demo page w/o having to type it in the search bar. 
+- updated flask to prevent entering demo page w/o logging in first
