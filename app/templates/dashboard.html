@@ -1,17 +1,22 @@
-<!-- Haowen Shao, Robert Chen, James sun, Cody Wong -->
-<!-- FinanceBros -->
-<!-- SoftDev -->
-<!-- 2026-05-13 -->
-<!-- time spent: 1 -->
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
   <title>Blossomberg: Dashboard</title>
   <meta charset="utf-8">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <nav>
-  </nav>
+<body class="bg-gray-100 min-h-screen">
+  {% include "navbar.html" %}
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Dashboard</h1>
+    <p class="text-gray-600">Welcome back, {{ user }}.</p>
+    <p class="text-gray-600 mt-4">
+      Explore the Navbar and check out
+      <a href="{{ url_for('demo') }}" class="text-blue-600 underline">Predictions</a>
+      to run the ML stock forecast demo.
+    </p>
+  </main>
+</body>
 </html>

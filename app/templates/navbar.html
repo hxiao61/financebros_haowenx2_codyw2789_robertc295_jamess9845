@@ -1,0 +1,24 @@
+<!-- Simple navbar for logged-in users -->
+<nav class="bg-blue-600 text-white shadow">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <a href="{{ url_for('dashboard') }}" class="text-lg font-bold hover:text-blue-100">
+      Blossomberg
+    </a>
+
+    <div class="flex flex-wrap items-center gap-4 text-sm">
+      <a href="{{ url_for('dashboard') }}"
+         class="hover:text-blue-100 {% if active == 'dashboard' %}underline font-semibold{% endif %}">
+        Dashboard
+      </a>
+      <a href="{{ url_for('demo') }}"
+         class="hover:text-blue-100 {% if active == 'demo' %}underline font-semibold{% endif %}">
+        Predictions
+      </a>
+      <span class="text-blue-200">Hi, {{ user }}</span>
+      <a href="{{ url_for('logout') }}"
+         class="bg-blue-800 hover:bg-blue-900 px-3 py-1 rounded">
+        Logout
+      </a>
+    </div>
+  </div>
+</nav>

@@ -65,9 +65,21 @@ def rolling_predictions_with_model(df, model):
     return pred_dates, preds
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user" not in session:
+            flash("Please log in first.", "warning")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.route("/demo")
+@login_required
 def demo():
-    return render_template("demo.html")
+    return render_template("demo.html", user=session["user"], active="demo")
 
 
 @app.route("/api/predict", methods=["POST"])
@@ -190,21 +202,10 @@ def logout():
     return redirect(url_for("login"))
 
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "user" not in session:
-            flash("Please log in first.", "warning")
-            return redirect(url_for("login"))
-        return f(*args, **kwargs)
-
-    return decorated_function
-
-
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", user=session["user"])
+    return render_template("dashboard.html", user=session["user"], active="dashboard")
 
 
 @app.route("/dashboard_data")
