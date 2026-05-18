@@ -104,3 +104,7 @@ is that we haven't connected everything yet.
 jamesS -- 2026-05-16 11:32
 - completely revamped login/register/dashboard ui + added navbar to redirect to demo page w/o having to type it in the search bar. 
 - updated flask to prevent entering demo page w/o logging in first
+
+robertC -- 2026-04-17 10:01
+-set up all the backend logic for portfolio and watchlist
+-seperated all the database code into build_db.py
