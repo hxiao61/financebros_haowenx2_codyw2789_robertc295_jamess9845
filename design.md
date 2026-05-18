@@ -109,14 +109,13 @@ Flask is what everyone has been using since day 1; it works well and fits our ne
 ## Key User Stories
 
 ### Day-trading retail investor
-As a retail investor who actively trades during market hours, I want to pull up a ticker, see its growth and make a decision. I want to use an AI-generated explanation of recent movement or any recent news that comes up so I can make a more informed decision without leaving the dashboard.
+As a retail investor actively trading during market hours, I want to pull up a ticker, see its growth and make a decision.  I want real-time price updates, technical indicators, and AI-generated summaries with verified news sources so that I can react quickly to market movements and make fast trading decisions.
 
 ### Aspiring finance student
-As an aspiring finance student who wants to learn how the market works, I want to compare two equities side by side and see a prediction with a confidence interval, so that I can build my knowledge for how prices move and what models predict before risking real money
+As a finance student learning how markets work, I want to compare equities side by side and view prediction models with confidence intervals and historical trend explanations so that I can better understand how market behavior and forecasting models operate before investing real money.
 
 ### Hobbyist with a watchlist
-As a hobbyist tracking a handful of my stocks, I want to save my tickers to a watchlist tied to my account and see their performance, so that I can monitor their performances all in one session and don't need multiple websites to track their performances and other relevant data.
-
+As a casual investor managing a personal watchlist, I want to save and organize my favorite tickers and monitor their long-term performance in one dashboard so that I can conveniently track my investments without using multiple platforms.
 ---
 
 # Database Design
@@ -259,16 +258,15 @@ As a hobbyist tracking a handful of my stocks, I want to save my tickers to a wa
 - Set up Flask backend framework and routing system
 - Create SQLite database tables and schema
 - Integrate yFinance APIs for live and historical stock data
+- Develop login/logout system and authentication flow
 - Design starter dashboard UI using TailwindCSS
 - Set up Flask sessions and backend infrastructure
-- Research and preprocess FAANG historical datasets for ML forecasting
 - Ensure the application runs locally with working routes and stock data retrieval
 
 ## Week 2 Goals:
 - Build dashboard interface and responsive layouts
 - Implement stock search functionality
 - Create Chart.js price, comparison, and volume charts
-- Develop login/logout system and authentication flow
 - Build watchlist and portfolio pages
 - Implement stock data caching system
 - Train and test Scikit-learn forecasting models
@@ -279,6 +277,7 @@ As a hobbyist tracking a handful of my stocks, I want to save my tickers to a wa
 - Integrate ML forecasts into frontend prediction charts
 - Build AI analysis panel using OpenRouter/OpenAI APIs
 - Improve dashboard styling and responsiveness
+- Research and preprocess FAANG historical datasets for ML forecasting
 - Perform backend integration and API reliability testing
 - Fix bugs and optimize application performance
 - Conduct full end-to-end testing across all components
