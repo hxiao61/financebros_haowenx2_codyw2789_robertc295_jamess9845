@@ -78,12 +78,12 @@ Features that **must** be completed:
 | ORM / DB Library | N/A |
 | Data Visualization | Chart.js |
 | Machine Learning | Sci-kit-Learn; PyTorch as stretch |
-| Market Data | yFinance, FAANG historical zip from Kaggle, Alpaca (optional) |
+| Market Data | yFinance, Alpaca (optional) |
 | AI | OpenRouter API, OpenAI API |
 
 ## Why This Stack Was Chosen
 
-Flask is what everyone has been using since day 1; it works well and fits our needs since we’re mostly serving cached data and proxying API calls instead of handling a lot of backend logic. SQLite is because our dataset fits in a single file and we don’t expect many users writing to the database at the time of MVP. We decided to go with TailwindCSS because it is the most customizable and easiest to work with for building a dashboard, and Chart.js is the best option for our needs for graphs, comparisons, and volume visualizations for equities as if we finish the MVP. ~~OpenRouter was chosen for the AI layer because it gives us access to multiple LLM providers without separate billing, and the student pack credits make it free for this project.~~ (SEEKING CLEARANCE)
+Flask is what everyone has been using since day 1; it works well and fits our needs since we’re mostly serving cached data and proxying API calls instead of handling a lot of backend logic. SQLite is because our dataset fits in a single file and we don’t expect many users writing to the database at the time of MVP. We decided to go with TailwindCSS because it is the most customizable and easiest to work with for building a dashboard, and Chart.js is the best option for our needs for graphs, comparisons, and volume visualizations for equities as if we finish the MVP. OpenRouter was chosen for the AI layer because it gives us access to multiple LLM providers without separate billing, and the student pack credits make it free for this project.
 
 ---
 
@@ -327,7 +327,7 @@ Project is considered complete when all of the following are true:
 # Appendix
 
 - Bloomberg Terminal pricing is estimated at approximately $25,000 per year, which creates a large accessibility barrier for students and beginner investors.
-- Historical FAANG stock datasets from Kaggle may be combined with live yFinance data to improve ML forecasting accuracy.
+- Live and old yFinance data to improve ML forecasting accuracy.
 - OpenRouter was selected because it supports multiple LLM providers under one API and includes student developer credits.
 - SQLite was chosen over MongoDB/PostgreSQL because the project mainly reads cached data and does not require large-scale concurrent writes.
 - Chart.js was selected because it is lightweight, easy to integrate with Flask, and supports line graphs, comparison charts, and volume visualizations needed for the MVP.
