@@ -118,3 +118,7 @@ haowenX -- 2026-05-18 6:15
 - deployed financebros.app 
 - removed Kaggle data set from design doc and markdown, as we will not be using it
 it is more convenient to use yfinance as it serves all of our purposes.
+
+codyW -- 2026-05-18 11:13
+- Added Faang.csv as a backup to our YFinance
+- Working on ai analysis demonstration utilizing openrouter(considering groq, chatgpt, gemini, and other api service) 
