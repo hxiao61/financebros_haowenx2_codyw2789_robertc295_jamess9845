@@ -18,16 +18,12 @@ from build_db import (
     create_user,
     cache_dataframe,
     get_cached_rows,
-    log_ml_prediction,
     get_watchlist,
     add_to_watchlist,
     remove_from_watchlist,
     get_portfolio,
     upsert_portfolio,
     remove_from_portfolio,
-    log_ai_query,
-    get_ai_history,
-    get_ml_predictions,
 )
 
 app = Flask(__name__)
@@ -45,9 +41,6 @@ OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL   = "openai/gpt-4o-mini"
 
 
-# ---------------------------------------------------------------
-# ML HELPERS  (unchanged from original)
-# ---------------------------------------------------------------
 
 def get_history(ticker: str, period: str = "6mo"):
     df = yf.Ticker(ticker).history(period=period)
@@ -225,88 +218,9 @@ def demo():
     return render_template("demo.html", user=session["user"], active="demo")
 
 
-# ---------------------------------------------------------------
-# ML PREDICTION API
-# ---------------------------------------------------------------
 
-@app.route("/api/predict", methods=["POST"])
-def predict():
-    data   = request.get_json(silent=True) or {}
-    ticker = str(data.get("ticker", "NVDA")).strip().upper()
-    try:
-        model, model_source = get_model_for_ticker(ticker)
-        history             = get_history_cached(ticker, period="6mo")
-        x                   = build_features(history)
-        predicted_open      = float(model.predict(x)[0])
-
-        opens          = history["Open"]
-        labels         = [idx.strftime("%Y-%m-%d") for idx in opens.index]
-        actual         = [float(v) for v in opens.values]
-        rolling_labels, rolling_preds = rolling_predictions_with_model(history, model)
-        rolling_map    = dict(zip(rolling_labels, rolling_preds))
-        rolling_series = [rolling_map.get(label) for label in labels]
-
-        last_open  = float(history["Open"].iloc[-1])
-        delta      = predicted_open - last_open
-        delta_pct  = (delta / last_open) * 100 if last_open else 0.0
-
-        log_ml_prediction(ticker, predicted_open)
-
-        return jsonify({
-            "ticker":             ticker,
-            "labels":             labels + ["Next Day (Pred)"],
-            "actual":             actual + [None],
-            "rolling_prediction": rolling_series + [None],
-            "prediction":         [None] * len(actual) + [predicted_open],
-            "predicted_open":     round(predicted_open, 4),
-            "last_open":          round(last_open, 4),
-            "delta":              round(delta, 4),
-            "delta_pct":          round(delta_pct, 4),
-            "model_source":       model_source,
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-
-# ---------------------------------------------------------------
-# STOCK QUOTE API
-# ---------------------------------------------------------------
-
-@app.route("/api/quote")
-@login_required
-def quote():
-    ticker = request.args.get("ticker", "").strip().upper()
-    if not ticker:
-        return jsonify({"error": "ticker param required"}), 400
-    try:
-        hist   = get_history_cached(ticker, period="6mo")
-        labels = [idx.strftime("%Y-%m-%d") for idx in hist.index]
-        closes = [round(float(v), 4) for v in hist["Close"].values]
-        opens  = [round(float(v), 4) for v in hist["Open"].values]
-        vols   = [int(v) for v in hist["Volume"].values]
-
-        latest     = closes[-1]
-        prev_close = closes[-2] if len(closes) > 1 else latest
-        change     = round(latest - prev_close, 4)
-        change_pct = round(change / prev_close * 100, 4) if prev_close else 0.0
-
-        return jsonify({
-            "ticker":     ticker,
-            "labels":     labels,
-            "closes":     closes,
-            "opens":      opens,
-            "volumes":    vols,
-            "latest":     latest,
-            "change":     change,
-            "change_pct": change_pct,
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-
-# ---------------------------------------------------------------
 # WATCHLIST
-# ---------------------------------------------------------------
+
 
 @app.route("/watchlist")
 @login_required
@@ -354,9 +268,9 @@ def watchlist_remove():
     return jsonify({"status": "removed", "ticker": ticker})
 
 
-# ---------------------------------------------------------------
+
 # PORTFOLIO
-# ---------------------------------------------------------------
+
 
 @app.route("/portfolio")
 @login_required
@@ -433,76 +347,6 @@ def portfolio_remove():
     remove_from_portfolio(get_user_id(session["user"]), ticker)
     return jsonify({"status": "removed", "ticker": ticker})
 
-
-# ---------------------------------------------------------------
-# AI ANALYSIS
-# ---------------------------------------------------------------
-
-@app.route("/api/analyze", methods=["POST"])
-@login_required
-def analyze():
-    data     = request.get_json(silent=True) or {}
-    ticker   = str(data.get("ticker", "")).strip().upper()
-    question = str(data.get("question", "")).strip()
-
-    if not ticker or not question:
-        return jsonify({"error": "ticker and question are required"}), 400
-
-    try:
-        hist   = get_history_cached(ticker, period="1mo")
-        latest = float(hist["Close"].iloc[-1])
-        prev   = float(hist["Close"].iloc[-2])
-        chg    = round(latest - prev, 2)
-        chg_p  = round(chg / prev * 100, 2)
-        ctx = (
-            f"{ticker} closed at ${latest:.2f} today, "
-            f"{'up' if chg >= 0 else 'down'} ${abs(chg):.2f} ({abs(chg_p):.2f}%) from yesterday."
-        )
-    except Exception:
-        ctx = f"No recent price data available for {ticker}."
-
-    if not OPENROUTER_API_KEY:
-        return jsonify({"error": "OPENROUTER_API_KEY not set in environment"}), 500
-
-    try:
-        resp = requests.post(
-            OPENROUTER_URL,
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            json={
-                "model": OPENROUTER_MODEL,
-                "messages": [
-                    {"role": "system", "content": (
-                        "You are a concise financial analyst assistant. "
-                        "Answer the user's question about the stock using the provided context. "
-                        "Keep responses under 150 words. Do not give investment advice."
-                    )},
-                    {"role": "user", "content": f"Context: {ctx}\n\nQuestion: {question}"},
-                ],
-                "max_tokens": 300,
-            },
-            timeout=20,
-        )
-        resp.raise_for_status()
-        answer = resp.json()["choices"][0]["message"]["content"].strip()
-    except Exception as e:
-        return jsonify({"error": f"OpenRouter error: {str(e)}"}), 502
-
-    log_ai_query(get_user_id(session["user"]), ticker, question, answer)
-    return jsonify({"ticker": ticker, "question": question, "answer": answer})
-
-
-@app.route("/api/ai_history", methods=["GET"])
-@login_required
-def ai_history():
-    return jsonify({"history": get_ai_history(get_user_id(session["user"]))})
-
-
-# ---------------------------------------------------------------
-# STARTUP
-# ---------------------------------------------------------------
 
 init_db_full()
 
