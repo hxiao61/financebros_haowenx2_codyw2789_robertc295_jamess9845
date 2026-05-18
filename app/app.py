@@ -18,16 +18,12 @@ from build_db import (
     create_user,
     cache_dataframe,
     get_cached_rows,
-    log_ml_prediction,
     get_watchlist,
     add_to_watchlist,
     remove_from_watchlist,
     get_portfolio,
     upsert_portfolio,
     remove_from_portfolio,
-    log_ai_query,
-    get_ai_history,
-    get_ml_predictions,
 )
 
 app = Flask(__name__)
