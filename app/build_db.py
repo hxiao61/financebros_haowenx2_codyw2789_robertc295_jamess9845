@@ -116,9 +116,8 @@ def init_db_full():
     conn.close()
 
 
-# ---------------------------------------------------------------
 # USER HELPERS
-# ---------------------------------------------------------------
+
 
 def get_user_id(username: str):
     """Return the integer user id for a given username, or None."""
@@ -154,9 +153,8 @@ def create_user(username: str, hashed_password: str):
     conn.close()
 
 
-# ---------------------------------------------------------------
 # STOCK CACHE HELPERS
-# ---------------------------------------------------------------
+
 
 def cache_dataframe(ticker: str, df):
     """Write a yFinance history DataFrame into stock_cache."""
@@ -201,9 +199,8 @@ def get_cached_rows(ticker: str, since_date: str):
     return rows
 
 
-# ---------------------------------------------------------------
 # WATCHLIST HELPERS
-# ---------------------------------------------------------------
+
 
 def get_watchlist(user_id: int):
     """Return all tickers on a user's watchlist."""
@@ -238,9 +235,8 @@ def remove_from_watchlist(user_id: int, ticker: str):
     conn.close()
 
 
-# ---------------------------------------------------------------
 # PORTFOLIO HELPERS
-# ---------------------------------------------------------------
+
 
 def get_portfolio(user_id: int):
     """Return all holdings for a user."""
@@ -298,78 +294,3 @@ def remove_from_portfolio(user_id: int, ticker: str):
     conn.commit()
     conn.close()
 
-
-# ---------------------------------------------------------------
-# AI QUERIES HELPERS
-# ---------------------------------------------------------------
-
-def log_ai_query(user_id: int, ticker: str, question: str, answer: str):
-    """Persist an AI analysis question + answer."""
-    conn = get_db_connection()
-    conn.execute(
-        "INSERT INTO ai_queries (user_id, ticker, question, answer) VALUES (?, ?, ?, ?)",
-        (user_id, ticker, question, answer),
-    )
-    conn.commit()
-    conn.close()
-
-
-def get_ai_history(user_id: int, limit: int = 20):
-    """Return the most recent AI queries for a user."""
-    conn = get_db_connection()
-    rows = conn.execute(
-        """
-        SELECT ticker, question, answer, created_at
-        FROM ai_queries
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT ?
-        """,
-        (user_id, limit),
-    ).fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
-
-
-# ---------------------------------------------------------------
-# ML PREDICTIONS HELPERS
-# ---------------------------------------------------------------
-
-def log_ml_prediction(ticker: str, predicted_price: float):
-    """
-    Persist an ML prediction. prediction_date = today, target_date = tomorrow.
-    Non-fatal — exceptions are swallowed so a logging failure never crashes a route.
-    """
-    today  = datetime.date.today()
-    target = today + datetime.timedelta(days=1)
-    try:
-        conn = get_db_connection()
-        conn.execute(
-            """
-            INSERT INTO ml_predictions
-                (ticker, prediction_date, target_date, predicted_price)
-            VALUES (?, ?, ?, ?)
-            """,
-            (ticker, today.strftime("%Y-%m-%d"), target.strftime("%Y-%m-%d"), predicted_price),
-        )
-        conn.commit()
-        conn.close()
-    except Exception:
-        pass
-
-
-def get_ml_predictions(ticker: str, limit: int = 30):
-    """Return the most recent ML predictions for a ticker."""
-    conn = get_db_connection()
-    rows = conn.execute(
-        """
-        SELECT prediction_date, target_date, predicted_price
-        FROM ml_predictions
-        WHERE ticker = ?
-        ORDER BY prediction_date DESC
-        LIMIT ?
-        """,
-        (ticker, limit),
-    ).fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
