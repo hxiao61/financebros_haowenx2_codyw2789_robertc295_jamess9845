@@ -14,6 +14,10 @@
          class="hover:text-blue-100 {% if active == 'demo' %}underline font-semibold{% endif %}">
         Predictions
       </a>
+      <a href="{{ url_for('aianalysis')}}"
+        class="hover:text-blue-100 {% if active == 'aianalysis' %}underline font-semibold{% endif %}">
+        AI Analysis
+      </a>
       <input id = "navbar-search" type="text" placeholder="Search for Ticker" class="px-2 py-1 rounded text-black">
       <button onclick="searchStock()">Search</button>
       <span id="search-result"></span>

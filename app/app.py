@@ -194,6 +194,10 @@ def get_dashboard_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/aianalysis")
+@login_required
+def aianalysis():
+    return render_template("ai_analysis.html", user=session["user"], active="aianalysis")
 
 # ---------------------------------------------------------------
 # DEMO
@@ -236,7 +240,7 @@ def stock_search():
         "price": round(latest, 2),
     })
 
-    
+
 # WATCHLIST
 
 
