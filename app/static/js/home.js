@@ -31,11 +31,30 @@ function loadWatchlist(){
 }
 
 function addStock() {
+    var inputBox = document.getElementById("add-ticker")
+    var ticker = inputBox.value
+    ticker = ticker.toUpperCase()
 
+    fetch("/api/watchlist/add", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ticker: ticker})})
+    .then(function(response){
+        return response.json()
+    })
+    .then(function(result){
+        inputBox.value = ""
+        loadWatchlist()
+    })
 }
 
 function removeStock(ticker){
-
+    fetch("/api/watchlist/remove", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ticker: ticker})})
+    .then(function(response){
+        return response.json()
+    })
+    .then(function(result){
+        loadWatchlist()
+    })
 }
 
 function searchStock() {
