@@ -29,18 +29,6 @@ from build_db import (
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "financebros")
 
-BASE_DIR   = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "proto" / "stock_model.pkl"
-MODELS_DIR = BASE_DIR / "proto" / "models"
-
-with MODEL_PATH.open("rb") as f:
-    default_model = pickle.load(f)
-
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL   = "openai/gpt-4o-mini"
-
-
 
 def get_history(ticker: str, period: str = "6mo"):
     df = yf.Ticker(ticker).history(period=period)
@@ -131,9 +119,9 @@ def get_dashboard_context():
     return {"market_summary": cards}
 
 
-# ---------------------------------------------------------------
+
 # AUTH DECORATOR
-# ---------------------------------------------------------------
+
 
 def login_required(f):
     @wraps(f)
@@ -145,9 +133,8 @@ def login_required(f):
     return decorated_function
 
 
-# ---------------------------------------------------------------
 # AUTH ROUTES
-# ---------------------------------------------------------------
+
 
 @app.route("/")
 def home():
