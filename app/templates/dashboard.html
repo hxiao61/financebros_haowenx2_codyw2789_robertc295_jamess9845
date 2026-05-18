@@ -5,39 +5,264 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up   { animation: fadeUp 0.35s ease both; }
+    .delay-1   { animation-delay: 0.05s; }
+    .delay-2   { animation-delay: 0.10s; }
+    .delay-3   { animation-delay: 0.15s; }
+    .delay-4   { animation-delay: 0.20s; }
+
+    tr:hover td { background-color: rgba(14, 36, 71, 0.5); }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+
+<body class="min-h-screen font-sans text-slate-200">
+
   {% include "navbar.html" %}
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2">Dashboard</h1>
-    <p class="text-gray-600">Welcome back, {{ user }}.</p>
-    <p class="text-gray-600 mt-4">
-      Explore the Navbar and check out
-      <a href="{{ url_for('demo') }}" class="text-blue-600 underline">Predictions</a>
-      to run the ML stock forecast demo.
-    </p>
+  <main class="max-w-6xl mx-auto px-6 py-10">
 
-    <div class="mt-8">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">My Watchlist</h2>
-      <div class="mb-4">
-        <input id="add-ticker" type = "text" placeholder="Enter ticker like AAPL" class="px-3 py-2 rounded text-sm">
-        <button onclick="addStock()">Add Stock</button>
+    <!-- Page Header -->
+    <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// terminal</p>
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">Dashboard</h1>
+        <p class="text-sm text-slate-500 mt-1.5">
+          Welcome back, <span class="text-slate-300 font-medium">{{ user }}</span>.
+          &nbsp;·&nbsp;
+          <a href="{{ url_for('demo') }}" class="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors">
+            ML Predictions →
+          </a>
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-0.5">Market Time</p>
+        <p class="font-mono text-sm text-slate-400" id="clock">--:--:--</p>
+      </div>
+    </div>
 
-        <table class="mt-4 w-full bg-white text-gray-800 text-sm">
+    <!-- Market Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+
+      <div class="fade-up delay-1 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-sky-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">S&amp;P 500</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="sp500-price">—</p>
+        <p class="font-mono text-xs mt-1 text-slate-600" id="sp500-change">Loading…</p>
+      </div>
+
+      <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-emerald-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">NASDAQ</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="nasdaq-price">—</p>
+        <p class="font-mono text-xs mt-1 text-slate-600" id="nasdaq-change">Loading…</p>
+      </div>
+
+      <div class="fade-up delay-3 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-violet-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">DOW</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="dow-price">—</p>
+        <p class="font-mono text-xs mt-1 text-slate-600" id="dow-change">Loading…</p>
+      </div>
+
+    </div>
+
+    <!-- Watchlist Section -->
+    <div class="fade-up delay-4">
+
+      <!-- Section label -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+          <h2 class="font-mono text-xs uppercase tracking-widest text-slate-500">My Watchlist</h2>
+        </div>
+        <span class="font-mono text-xs text-slate-700" id="watchlist-count"></span>
+      </div>
+
+      <!-- Add ticker -->
+      <div class="flex gap-2 mb-4">
+        <input
+          id="add-ticker"
+          type="text"
+          placeholder="Ticker — e.g. AAPL"
+          maxlength="10"
+          class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm text-slate-200 font-mono text-sm px-3 py-2 w-56 uppercase tracking-widest outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-700"
+        >
+        <button
+          onclick="addStock()"
+          class="bg-sky-700 hover:bg-sky-600 active:bg-sky-800 text-white font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-colors"
+        >
+          + Add
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-sm overflow-hidden">
+        <table class="w-full text-sm">
           <thead>
-            <tr>
-              <th>Ticker</th>
-              <th>Price</th>
-              <th>Remove</th>
+            <tr class="border-b border-slate-800 bg-slate-950/60">
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3 w-28">Ticker</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Price</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Change</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3 w-28">Action</th>
             </tr>
           </thead>
-          <tbody id = "watchlist-body">
+          <tbody id="watchlist-body">
+            <tr id="empty-row">
+              <td colspan="4" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
+                No tickers saved — add one above
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
-      <script src="/static/js/home.js"></script>
+
     </div>
   </main>
+
+  <script>
+    // ── Clock ──
+    function tick() {
+      document.getElementById("clock").textContent =
+        new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+    tick(); setInterval(tick, 1000);
+
+    // ── Helpers ──
+    function fmtChange(pct) {
+      const up  = pct >= 0;
+      const cls = up ? "text-emerald-400" : "text-red-400";
+      const sym = up ? "▲" : "▼";
+      return { cls, text: `${sym} ${Math.abs(pct).toFixed(2)}%` };
+    }
+
+    // ── Market summary ──
+    async function loadMarketSummary() {
+      try {
+        const res  = await fetch("/dashboard_data");
+        const data = await res.json();
+        const ids  = { "S&P 500": "sp500", "NASDAQ": "nasdaq", "DOW": "dow" };
+
+        for (const card of data.market_summary) {
+          const key = ids[card.name]; if (!key) continue;
+          const pe  = document.getElementById(`${key}-price`);
+          const ce  = document.getElementById(`${key}-change`);
+          if (card.price !== null) {
+            pe.textContent = `$${card.price.toLocaleString()}`;
+            const { cls, text } = fmtChange(card.change_pct);
+            ce.textContent  = text;
+            ce.className    = `font-mono text-xs mt-1 ${cls}`;
+          } else {
+            pe.textContent = "N/A"; ce.textContent = "—";
+          }
+        }
+      } catch (e) { console.error("Market error:", e); }
+    }
+    loadMarketSummary();
+
+    // ── Watchlist ──
+    async function loadWatchlist() {
+      const body = document.getElementById("watchlist-body");
+      const cnt  = document.getElementById("watchlist-count");
+      try {
+        const res  = await fetch("/api/watchlist");
+        const data = await res.json();
+
+        body.innerHTML = "";
+        if (!data.tickers?.length) {
+          cnt.textContent = "";
+          body.innerHTML  = `<tr><td colspan="4" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">No tickers saved — add one above</td></tr>`;
+          return;
+        }
+
+        cnt.textContent = `${data.tickers.length} ticker${data.tickers.length !== 1 ? "s" : ""}`;
+
+        for (const ticker of data.tickers) {
+          const row = document.createElement("tr");
+          row.id    = `row-${ticker}`;
+          row.className = "border-t border-slate-800/70 transition-colors";
+          row.innerHTML = `
+            <td class="font-mono text-sm font-medium text-sky-400 px-5 py-3">${ticker}</td>
+            <td class="font-mono text-sm text-slate-200 text-right px-5 py-3" id="price-${ticker}">
+              <span class="text-slate-700 text-xs">…</span>
+            </td>
+            <td class="font-mono text-xs text-slate-600 text-right px-5 py-3" id="chg-${ticker}">—</td>
+            <td class="text-right px-5 py-3">
+              <button onclick="removeStock('${ticker}')"
+                class="font-mono text-xs text-slate-700 hover:text-red-400 transition-colors uppercase tracking-widest">
+                ✕ Remove
+              </button>
+            </td>`;
+          body.appendChild(row);
+          fetchQuote(ticker);
+        }
+      } catch (e) { console.error("Watchlist error:", e); }
+    }
+
+    async function fetchQuote(ticker) {
+      try {
+        const res  = await fetch(`/api/quote?ticker=${ticker}`);
+        const data = await res.json();
+        if (data.error) return;
+        const pe = document.getElementById(`price-${ticker}`);
+        const ce = document.getElementById(`chg-${ticker}`);
+        if (pe) pe.textContent = `$${data.latest.toFixed(2)}`;
+        if (ce) {
+          const { cls, text } = fmtChange(data.change_pct);
+          ce.textContent = text;
+          ce.className   = `font-mono text-xs text-right px-5 py-3 ${cls}`;
+        }
+      } catch (e) { console.error(`Quote error ${ticker}:`, e); }
+    }
+
+    async function addStock() {
+      const input  = document.getElementById("add-ticker");
+      const ticker = input.value.trim().toUpperCase();
+      if (!ticker) return;
+      try {
+        const res  = await fetch("/api/watchlist/add", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ticker }),
+        });
+        const data = await res.json();
+        if (data.error) { alert(data.error); return; }
+        input.value = "";
+        loadWatchlist();
+      } catch (e) { console.error("Add error:", e); }
+    }
+
+    async function removeStock(ticker) {
+      try {
+        await fetch("/api/watchlist/remove", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ticker }),
+        });
+        loadWatchlist();
+      } catch (e) { console.error("Remove error:", e); }
+    }
+
+    document.getElementById("add-ticker").addEventListener("keydown", e => {
+      if (e.key === "Enter") addStock();
+    });
+
+    loadWatchlist();
+  </script>
+
 </body>
 </html>
