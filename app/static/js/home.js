@@ -58,5 +58,16 @@ function removeStock(ticker){
 }
 
 function searchStock() {
+    var searchBox = document.getElementById("navbar-search")
+    var query = searchBox.value
+    query = query.toUpperCase()
 
+    fetch("/api/stocks/search?q=" + query)
+    .then(function(response){
+        return response.json()
+    })
+    .then(function(result){
+        var resultSpan = document.getElementById("search-result")
+        resultSpan.innerText = result.name + "- $" + result.price
+    })
 }
