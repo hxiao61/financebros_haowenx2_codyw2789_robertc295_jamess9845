@@ -105,7 +105,16 @@ jamesS -- 2026-05-16 11:32
 - completely revamped login/register/dashboard ui + added navbar to redirect to demo page w/o having to type it in the search bar. 
 - updated flask to prevent entering demo page w/o logging in first
 
-robertC -- 2026-04-17 10:01
+robertC -- 2026-05-17 10:01
 - GET/POST routes for watchlist and portfolio with login protection
 - Moved all sqlite3 logic out of app.py into build_db.py
 - init_db_full() now creates all 6 tables on startup
+
+haowenX -- 2026-05-18 6:15
+- Built dashboard watchlist with table, add/remove
+- Added api/stocks/price and /api/stocks/search to app.py
+- Added search input to navbar
+- wrote home.js to handle everything
+- deployed financebros.app 
+- removed Kaggle data set from design doc and markdown, as we will not be using it
+it is more convenient to use yfinance as it serves all of our purposes.
