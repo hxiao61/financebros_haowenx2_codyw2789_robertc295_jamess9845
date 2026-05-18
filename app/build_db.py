@@ -13,9 +13,8 @@ import datetime
 DATABASE = "users.db"
 
 
-# ---------------------------------------------------------------
+
 # CONNECTION
-# ---------------------------------------------------------------
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -23,9 +22,8 @@ def get_db_connection():
     return conn
 
 
-# ---------------------------------------------------------------
 # TABLE CREATION
-# ---------------------------------------------------------------
+
 
 def init_db():
     """Original users table — kept separate so existing code still works."""
