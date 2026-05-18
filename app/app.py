@@ -41,9 +41,6 @@ OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL   = "openai/gpt-4o-mini"
 
 
-# ---------------------------------------------------------------
-# ML HELPERS  (unchanged from original)
-# ---------------------------------------------------------------
 
 def get_history(ticker: str, period: str = "6mo"):
     df = yf.Ticker(ticker).history(period=period)
