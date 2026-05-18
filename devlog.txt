@@ -106,5 +106,6 @@ jamesS -- 2026-05-16 11:32
 - updated flask to prevent entering demo page w/o logging in first
 
 robertC -- 2026-04-17 10:01
--set up all the backend logic for portfolio and watchlist
--seperated all the database code into build_db.py
+- GET/POST routes for watchlist and portfolio with login protection
+- Moved all sqlite3 logic out of app.py into build_db.py
+- init_db_full() now creates all 6 tables on startup
