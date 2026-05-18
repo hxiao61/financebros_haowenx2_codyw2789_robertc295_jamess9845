@@ -204,8 +204,39 @@ def get_dashboard_data():
 def demo():
     return render_template("demo.html", user=session["user"], active="demo")
 
+# STOCK DATA
+@app.route("/api/stocks/price")
+@login_required
+def stock_price():
+    ticker = request.args.get("ticker")
+    ticker = ticker.upper()
 
+    hist = get_history_cached(ticker, period="1mo")
+    latest = float(hist["Close"].iloc[-1])
 
+    return jsonify({
+        "ticker": ticker,
+        "price": round(latest, 2),
+    })
+
+@app.route("/api/stocks/search")
+@login_required
+def stock_search():
+    query = request.args.get("q")
+    query = query.upper()
+
+    stock_info = yf.Ticker(query).info
+    name = stock_info.get("longName")
+    hist = get_history_cached(query, period="1mo")
+    latest = float(hist["Close"].iloc[-1])
+
+    return jsonify({
+        "ticker": query,
+        "name": name,
+        "price": round(latest, 2),
+    })
+
+    
 # WATCHLIST
 
 
