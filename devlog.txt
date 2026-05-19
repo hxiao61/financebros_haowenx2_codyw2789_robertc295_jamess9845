@@ -24,7 +24,7 @@ haowenX -- 2026-05-08
 Fixed a back end error involving a pytorch prediction
 Working on design doc, implemented
 
-codyW -- 2026-05-08 2:46
+codyW -- 2026-05-08 02:46
 - Revamped that desing document.
 - I have cancer doing this desing document.
 - The demo too I tried to do but I used another method.
@@ -43,16 +43,16 @@ codyW -- 2026-05-12 11:34
 - Working on a new design document
 - Working on new chart.js deployment example for showcasting our Ml model forcasting.
 
-haowenX -- 2026-05-13 1:05
+haowenX -- 2026-05-13 01:05
 - Finished and revised design doc.
 - in my opinion the PERFECT design doc
 
-codyW -- 2026-05-13 2:37
+codyW -- 2026-05-13 02:37
 - Built a working Flask + Chart.js prediction demo pag
 - Integrated yfinance data retrieval and visualized predictions vs actual prices.
 - Added quick ticker demo buttons (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA).
 
-haowenX -- 2026-05-13 5:43
+haowenX -- 2026-05-13 05:43
 Python style (PEP 8):
 The most applicable of PEP 8 to our codebase were naming conventions and inline comments.
 Our ML code has a lot of math and logic that isn't obvious at first glance, so without ocmments
@@ -110,7 +110,7 @@ robertC -- 2026-05-17 10:01
 - Moved all sqlite3 logic out of app.py into build_db.py
 - init_db_full() now creates all 6 tables on startup
 
-haowenX -- 2026-05-18 6:15
+haowenX -- 2026-05-18 06:15
 - Built dashboard watchlist with table, add/remove
 - Added api/stocks/price and /api/stocks/search to app.py
 - Added search input to navbar
@@ -123,7 +123,14 @@ codyW -- 2026-05-18 11:13
 - Added Faang.csv as a backup to our YFinance
 - Working on ai analysis demonstration utilizing openrouter(considering groq, chatgpt, gemini, and other api service)
 
-haowenX -- 2025-05-19 11:43
+haowenX -- 2025-05-18 11:43
 - Decided its best to have Faang.csv in case of any errors involving YFinance
 - Added aianalysis path to app.py, added it to Navbar
 - Gave aianalysis and stock_viewer its base
+
+haowenX -- 2025-05-19 05:01
+- Moved Robert's code into home.js for structuring
+- Robert implemented a dark theme to dashboard as well as a percent change in price, a market summary (DOW, S&P 500, NASDAQ)
+- Merged his code with previous js, though need to implement change in time (/api/stock/price)
+- Fixed duplicant functions
+- Need to update design to integrate back Kaggle CSV 

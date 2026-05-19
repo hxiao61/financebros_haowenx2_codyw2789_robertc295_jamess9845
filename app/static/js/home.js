@@ -55,7 +55,6 @@ function searchStock() {
         }
       } catch (e) { console.error("Market error:", e); }
     }
-    loadMarketSummary();
 
     // ── Watchlist ──
     async function loadWatchlist() {
