@@ -133,4 +133,10 @@ haowenX -- 2025-05-19 05:01
 - Robert implemented a dark theme to dashboard as well as a percent change in price, a market summary (DOW, S&P 500, NASDAQ)
 - Merged his code with previous js, though need to implement change in time (/api/stock/price)
 - Fixed duplicant functions
-- Need to update design to integrate back Kaggle CSV 
+- Need to update design to integrate back Kaggle CSV
+
+haowenX -- 2025-05-19 11:36
+- To Do:
+In design doc, integrate back Kaggle CSV, combine dashboard with portfolio.
+- Fixed change percent change in price.
+- Added forecast and stockviewer navbar and page

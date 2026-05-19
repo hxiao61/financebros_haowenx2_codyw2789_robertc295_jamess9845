@@ -199,6 +199,16 @@ def get_dashboard_data():
 def aianalysis():
     return render_template("ai_analysis.html", user=session["user"], active="aianalysis")
 
+@app.route("/stockviewer")
+@login_required
+def stockviewer():
+    return render_template("stock_viewer.html", user=session["user"], active="stockviewer")
+
+@app.route("/forecast")
+@login_required
+def forecast():
+    return render_template("forecast.html", user=session["user"], active="forecast")
+
 # ---------------------------------------------------------------
 # DEMO
 # ---------------------------------------------------------------
