@@ -140,3 +140,7 @@ haowenX -- 2025-05-19 11:36
 In design doc, integrate back Kaggle CSV, combine dashboard with portfolio.
 - Fixed change percent change in price.
 - Added forecast and stockviewer navbar and page
+
+codyW -- 2025-05-19 11:45
+- put a pin on utilizing Gpu apis for processing our .pkl for the world-wide stock web
+- Upgrading droplet would speed this up(HAOOWEEEN)
