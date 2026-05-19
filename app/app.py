@@ -217,10 +217,13 @@ def stock_price():
 
     hist = get_history_cached(ticker, period="1mo")
     latest = float(hist["Close"].iloc[-1])
+    prev = float(hist["Close"].iloc[-2])
+    change_pct = round((latest - prev) / prev * 100, 2)
 
     return jsonify({
         "ticker": ticker,
         "price": round(latest, 2),
+        "change_pct" : change_pct
     })
 
 @app.route("/api/stocks/search")
