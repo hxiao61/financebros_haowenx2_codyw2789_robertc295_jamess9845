@@ -123,30 +123,33 @@ codyW -- 2026-05-18 11:13
 - Added Faang.csv as a backup to our YFinance
 - Working on ai analysis demonstration utilizing openrouter(considering groq, chatgpt, gemini, and other api service)
 
-haowenX -- 2025-05-18 11:43
+haowenX -- 2026-05-18 11:43
 - Decided its best to have Faang.csv in case of any errors involving YFinance
 - Added aianalysis path to app.py, added it to Navbar
 - Gave aianalysis and stock_viewer its base
 
-haowenX -- 2025-05-19 05:01
+haowenX -- 2026-05-19 05:01
 - Moved Robert's code into home.js for structuring
 - Robert implemented a dark theme to dashboard as well as a percent change in price, a market summary (DOW, S&P 500, NASDAQ)
 - Merged his code with previous js, though need to implement change in time (/api/stock/price)
 - Fixed duplicant functions
 - Need to update design to integrate back Kaggle CSV
 
-haowenX -- 2025-05-19 11:36
+haowenX -- 2026-05-19 11:36
 - To Do:
 In design doc, integrate back Kaggle CSV, combine dashboard with portfolio.
 - Fixed change percent change in price.
 - Added forecast and stockviewer navbar and page
 
-codyW -- 2025-05-19 11:45
+codyW -- 2025-06-19 11:45
 - put a pin on utilizing Gpu apis for processing our .pkl for the world-wide stock web
 - Upgrading droplet would speed this up(HAOOWEEEN)
 
-haowenX -- 2025-05-20 17:45
+haowenX -- 2026-05-20 17:45
 - Worked with group to develop a new design doc as well as where to put OpeunRouter
 - Personally I had AP Microeconomics but assigned group mates their tasks
 
-haowenX --2025-05-21 3:56
+haowenX --2026-05-21 3:56
+
+robertC --2026-05-21 11:23
+-started stockviewer page
