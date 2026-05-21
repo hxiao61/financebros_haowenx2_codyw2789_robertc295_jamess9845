@@ -78,7 +78,7 @@ Features that **must** be completed:
 | ORM / DB Library | N/A |
 | Data Visualization | Chart.js |
 | Machine Learning | Sci-kit-Learn; PyTorch as stretch |
-| Market Data | yFinance, Alpaca (optional) |
+| Market Data | Kaggle CSV, yFinance, Alpaca (optional) |
 | AI | OpenRouter API, OpenAI API |
 
 ## Why This Stack Was Chosen
@@ -257,7 +257,7 @@ As a casual investor managing a personal watchlist, I want to save and organize 
 - Create GitHub repository and organize overall project structure
 - Set up Flask backend framework and routing system
 - Create SQLite database tables and schema
-- Integrate yFinance APIs for live and historical stock data
+- Integrate yFinance APIs for live and Kaggle historical stock data
 - Develop login/logout system and authentication flow
 - Design starter dashboard UI using TailwindCSS
 - Set up Flask sessions and backend infrastructure

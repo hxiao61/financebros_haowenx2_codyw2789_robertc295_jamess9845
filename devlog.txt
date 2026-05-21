@@ -144,3 +144,9 @@ In design doc, integrate back Kaggle CSV, combine dashboard with portfolio.
 codyW -- 2025-05-19 11:45
 - put a pin on utilizing Gpu apis for processing our .pkl for the world-wide stock web
 - Upgrading droplet would speed this up(HAOOWEEEN)
+
+haowenX -- 2025-05-20 17:45
+- Worked with group to develop a new design doc as well as where to put OpeunRouter
+- Personally I had AP Microeconomics but assigned group mates their tasks
+
+haowenX --2025-05-21 3:56
