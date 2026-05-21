@@ -150,6 +150,12 @@ haowenX -- 2026-05-20 17:45
 - Personally I had AP Microeconomics but assigned group mates their tasks
 
 haowenX --2026-05-21 3:56
+- Integrated Kaggle FAANG csv back
 
 robertC --2026-05-21 11:23
 -started stockviewer page
+
+haowenX -- 2025-05-21 11:44
+- started stockviewer with robert
+- his old code is having issues (he puled from his old repo)
+- we have different ideas so i put mine in stockveiwer 2, we plan on it viewing different popular stocks
