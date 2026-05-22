@@ -171,7 +171,10 @@ jamesS -- 2026-05-22 11:10
 - checked in with cody to fix demo page
 
 codyW -- 2026-05-22 11:29
-- finished openrouter call checking with free model(specifically deepseek v4-flash free). 
+- finished openrouter call checking with free model(specifically deepseek v4-flash free).
 - In my thoughts pretty good as I'd say, "type shit"
-- also I'm working on the error handeling for pretrained pkl files for our machine learning protocol that will 
-specifically target new stocks and our current fang stocks that are integrated in this repository. 
+- also I'm working on the error handeling for pretrained pkl files for our machine learning protocol that will
+specifically target new stocks and our current fang stocks that are integrated in this repository.
+
+haowenX -- 2026-05-22 11:44
+- Touched shop on to do, arranged meeting time, will update design with new designs.
