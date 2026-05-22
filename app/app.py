@@ -226,6 +226,7 @@ def stock_price():
     ticker = ticker.upper()
 
     hist = get_history_cached(ticker, period="1mo")
+    # hist = yf.Ticker(ticker).history(period="1d", interval="5m")
     latest = float(hist["Close"].iloc[-1])
     prev = float(hist["Close"].iloc[-2])
     change_pct = round((latest - prev) / prev * 100, 2)
@@ -233,7 +234,11 @@ def stock_price():
     return jsonify({
         "ticker": ticker,
         "price": round(latest, 2),
-        "change_pct" : change_pct
+        "change_pct" : change_pct,
+        "open": round(float(hist["Open"].iloc[-1]), 2),
+        "high": round(float(hist["High"].iloc[-1]), 2),
+        "low": round(float(hist["Low"].iloc[-1]), 2),
+        "volume": round(float(hist["Volume"].iloc[-1]), 2),
     })
 
 @app.route("/api/stocks/search")

@@ -83,6 +83,10 @@ function searchStock() {
               <span class="text-slate-700 text-xs">…</span>
             </td>
             <td class="font-mono text-xs text-slate-600 text-right px-5 py-3" id="chg-${ticker}">—</td>
+            <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="open-${ticker}">—</td>
+            <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="high-${ticker}">—</td>
+            <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="low-${ticker}">—</td>
+            <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="vol-${ticker}">—</td>
             <td class="text-right px-5 py-3">
               <button onclick="removeStock('${ticker}')"
                 class="font-mono text-xs text-slate-700 hover:text-red-400 transition-colors uppercase tracking-widest">
@@ -108,6 +112,7 @@ function searchStock() {
           ce.textContent = text;
           ce.className   = `font-mono text-xs text-right px-5 py-3 ${cls}`;
         }
+        
       } catch (e) { console.error(`Quote error ${ticker}:`, e); }
     }
 
