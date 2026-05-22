@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     body { background-color: #060d1b; }
-
+ 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -30,17 +30,17 @@
     .delay-2   { animation-delay: 0.10s; }
     .delay-3   { animation-delay: 0.15s; }
     .delay-4   { animation-delay: 0.20s; }
-
+ 
     tr:hover td { background-color: rgba(14, 36, 71, 0.5); }
   </style>
 </head>
-
+ 
 <body class="min-h-screen font-sans text-slate-200">
-
+ 
   {% include "navbar.html" %}
-
+ 
   <main class="max-w-6xl mx-auto px-6 py-10">
-
+ 
     <!-- Page Header -->
     <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
       <div>
@@ -59,33 +59,33 @@
         <p class="font-mono text-sm text-slate-400" id="clock">--:--:--</p>
       </div>
     </div>
-
+ 
     <!-- Market Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-
+ 
       <div class="fade-up delay-1 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-sky-500 px-5 py-4">
         <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">S&amp;P 500</p>
         <p class="font-mono text-xl font-semibold text-slate-100" id="sp500-price">—</p>
         <p class="font-mono text-xs mt-1 text-slate-600" id="sp500-change">Loading…</p>
       </div>
-
+ 
       <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-emerald-500 px-5 py-4">
         <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">NASDAQ</p>
         <p class="font-mono text-xl font-semibold text-slate-100" id="nasdaq-price">—</p>
         <p class="font-mono text-xs mt-1 text-slate-600" id="nasdaq-change">Loading…</p>
       </div>
-
+ 
       <div class="fade-up delay-3 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-violet-500 px-5 py-4">
         <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">DOW</p>
         <p class="font-mono text-xl font-semibold text-slate-100" id="dow-price">—</p>
         <p class="font-mono text-xs mt-1 text-slate-600" id="dow-change">Loading…</p>
       </div>
-
+ 
     </div>
-
+ 
     <!-- Watchlist Section -->
     <div class="fade-up delay-4">
-
+ 
       <!-- Section label -->
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
@@ -94,7 +94,7 @@
         </div>
         <span class="font-mono text-xs text-slate-700" id="watchlist-count"></span>
       </div>
-
+ 
       <!-- Add ticker -->
       <div class="flex gap-2 mb-4">
         <input
@@ -111,7 +111,7 @@
           + Add
         </button>
       </div>
-
+ 
       <!-- Table -->
       <div class="bg-slate-900 border border-slate-800 rounded-sm overflow-hidden">
         <table class="w-full text-sm">
@@ -120,23 +120,25 @@
               <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3 w-28">Ticker</th>
               <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Price</th>
               <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Change</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3 w-24">View</th>
               <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3 w-28">Action</th>
             </tr>
           </thead>
           <tbody id="watchlist-body">
             <tr id="empty-row">
-              <td colspan="4" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
+              <td colspan="5" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
                 No tickers saved — add one above
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
+ 
     </div>
   </main>
-
-  <script src = "/static/js/home.js"></script>
-
+ 
+  <script src="/static/js/home.js"></script>
+ 
 </body>
 </html>
+ 
