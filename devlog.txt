@@ -155,7 +155,12 @@ haowenX --2026-05-21 3:56
 robertC --2026-05-21 11:23
 -started stockviewer page
 
-haowenX -- 2025-05-21 11:44
+haowenX -- 2026-05-21 11:44
 - started stockviewer with robert
 - his old code is having issues (he puled from his old repo)
 - we have different ideas so i put mine in stockveiwer 2, we plan on it viewing different popular stocks
+
+haowenX -- 2026-05-22 6:23
+- Fixed Dashboard.js
+- Added Open, Close, Volume, High, Low to dashbaord as they are critical information
+- Considering getting prices every 5 minutes instead of day to mimic bloomberg better, need to discuss with team
