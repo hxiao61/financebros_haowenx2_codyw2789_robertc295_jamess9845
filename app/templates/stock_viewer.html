@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>{{ ticker }}{% if compare %} vs {{ compare }}{% endif %} — Blossomberg</title>
+  <title>Stock Viewer — Blossomberg</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,18 +18,13 @@
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script src="{{ url_for('static', filename='chart.umd.min.js') }}"></script>
   <style>
     body { background-color: #060d1b; }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .fade-up  { animation: fadeUp 0.35s ease both; }
-    .delay-1  { animation-delay: 0.05s; }
-    .delay-2  { animation-delay: 0.10s; }
-    .delay-3  { animation-delay: 0.15s; }
+    .fade-up { animation: fadeUp 0.35s ease both; }
   </style>
 </head>
 
@@ -39,222 +34,47 @@
 
   <main class="max-w-6xl mx-auto px-6 py-10">
 
-    <!-- Page header -->
+    <!-- Header -->
     <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
       <div>
         <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// stock viewer</p>
-        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">
-          {{ ticker }}{% if compare %} <span class="text-slate-600">vs</span> {{ compare }}{% endif %}
-        </h1>
-        <p class="font-mono text-xs text-slate-600 mt-1 uppercase tracking-widest">
-          Source: {{ data_source }}{% if compare %} · {{ compare_source }}{% endif %}
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">Top 15 Stocks</h1>
+      </div>
+      <div class="text-right">
+        <p id="clock" class="font-mono text-lg text-slate-300"></p>
+        <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mt-1">
+          Updated: <span id="last-updated">—</span>
         </p>
       </div>
-
-      <!-- Compare / search form -->
-      <form method="GET" class="flex gap-2 items-center">
-        <input type="hidden" name="ticker" value="{{ ticker }}">
-        <input
-          name="compare"
-          type="text"
-          placeholder="Compare ticker…"
-          value="{{ compare or '' }}"
-          maxlength="10"
-          class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-sm text-slate-200 px-3 py-2 w-44 uppercase tracking-widest outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-700"
-        >
-        <button type="submit"
-          class="bg-sky-700 hover:bg-sky-600 text-white font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-colors">
-          Compare
-        </button>
-        {% if compare %}
-        <a href="?ticker={{ ticker }}"
-          class="font-mono text-xs text-slate-600 hover:text-red-400 transition-colors uppercase tracking-widest px-2 py-2">
-          ✕ Clear
-        </a>
-        {% endif %}
-      </form>
     </div>
 
-    <!-- Stat cards -->
-    <div class="grid grid-cols-1 {% if compare %}md:grid-cols-2{% endif %} gap-6 mb-8">
-
-      <!-- Ticker 1 -->
-      <div class="fade-up delay-1 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-sky-500 px-6 py-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-mono text-lg font-semibold text-sky-400 tracking-wide">{{ ticker }}</h2>
-          <span class="font-mono text-xs text-slate-600 uppercase tracking-widest">Primary</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">Latest</p>
-            <p class="font-mono text-base font-semibold text-slate-100">${{ latest_price }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">5Y High</p>
-            <p class="font-mono text-base font-semibold text-emerald-400">${{ high }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">5Y Low</p>
-            <p class="font-mono text-base font-semibold text-red-400">${{ low }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">Avg Vol</p>
-            <p class="font-mono text-base font-semibold text-slate-200">{{ avg_volume }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ticker 2 (compare mode) -->
-      {% if compare %}
-      <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-orange-500 px-6 py-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-mono text-lg font-semibold text-orange-400 tracking-wide">{{ compare }}</h2>
-          <span class="font-mono text-xs text-slate-600 uppercase tracking-widest">Comparison</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">Latest</p>
-            <p class="font-mono text-base font-semibold text-slate-100">${{ latest2 }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">5Y High</p>
-            <p class="font-mono text-base font-semibold text-emerald-400">${{ high2 }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">5Y Low</p>
-            <p class="font-mono text-base font-semibold text-red-400">${{ low2 }}</p>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800 rounded-sm px-4 py-3">
-            <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-1">Avg Vol</p>
-            <p class="font-mono text-base font-semibold text-slate-200">{{ avg_vol2 }}</p>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-    </div>
-
-    <!-- Period selector -->
-    <div class="fade-up delay-2 flex items-center gap-2 mb-3">
-      <span class="font-mono text-xs text-slate-600 uppercase tracking-widest mr-2">Period</span>
-      {% for p in ['1mo', '3mo', '6mo', '1y', '2y', '5y'] %}
-      <a href="?ticker={{ ticker }}{% if compare %}&compare={{ compare }}{% endif %}&period={{ p }}"
-        class="font-mono text-xs px-3 py-1 rounded-sm border transition-colors uppercase tracking-widest
-               {% if period == p %}
-                 bg-sky-700 border-sky-600 text-white
-               {% else %}
-                 bg-slate-900 border-slate-700 text-slate-500 hover:border-sky-700 hover:text-sky-400
-               {% endif %}">
-        {{ p }}
-      </a>
-      {% endfor %}
-    </div>
-
-    <!-- Chart -->
-    <div class="fade-up delay-3 bg-slate-900 border border-slate-800 rounded-sm p-6">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
-          <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500">
-            Price History{% if compare %}: {{ ticker }} vs {{ compare }}{% endif %}
-          </h3>
-        </div>
-        <!-- Legend -->
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-1.5">
-            <span class="inline-block w-6 h-0.5 bg-sky-500 rounded"></span>
-            <span class="font-mono text-xs text-slate-500">{{ ticker }}</span>
-          </div>
-          {% if compare %}
-          <div class="flex items-center gap-1.5">
-            <span class="inline-block w-6 h-0.5 bg-orange-500 rounded"></span>
-            <span class="font-mono text-xs text-slate-500">{{ compare }}</span>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-      <canvas id="stockChart" height="100"></canvas>
+    <!-- Table -->
+    <div class="fade-up bg-slate-900 border border-slate-800 rounded-sm overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-slate-800">
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-left px-5 py-3">Ticker</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Price</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Change</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Open</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">High</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Low</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Volume</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">View</th>
+          </tr>
+        </thead>
+        <tbody id="stockviewer-body">
+          <tr>
+            <td colspan="8" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
+              Loading…
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
   </main>
 
-  <script>
-    const labels   = {{ dates   | tojson }};
-    const prices1  = {{ closes1 | tojson }};
-    const prices2  = {{ closes2 | tojson }};
-    const compareMode = {{ 'true' if compare else 'false' }};
-
-    const datasets = [{
-      label:       '{{ ticker }}',
-      data:        prices1,
-      borderColor: 'rgb(56, 189, 248)',   /* sky-400 */
-      borderWidth: 2,
-      backgroundColor: 'rgba(56, 189, 248, 0.06)',
-      fill:        true,
-      tension:     0.3,
-      pointRadius: 0,
-      pointHoverRadius: 4,
-    }];
-
-    if (compareMode) {
-      datasets.push({
-        label:       '{{ compare }}',
-        data:        prices2,
-        borderColor: 'rgb(251, 146, 60)',  /* orange-400 */
-        borderWidth: 2,
-        backgroundColor: 'rgba(251, 146, 60, 0.06)',
-        fill:        true,
-        tension:     0.3,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-      });
-    }
-
-    new Chart(document.getElementById('stockChart').getContext('2d'), {
-      type: 'line',
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#0f172a',
-            borderColor:     '#1e293b',
-            borderWidth:     1,
-            titleColor:      '#94a3b8',
-            bodyColor:       '#e2e8f0',
-            titleFont:       { family: '"IBM Plex Mono"', size: 11 },
-            bodyFont:        { family: '"IBM Plex Mono"', size: 12 },
-            padding:         10,
-            callbacks: {
-              label: ctx => ` ${ctx.dataset.label}  $${ctx.parsed.y.toFixed(2)}`
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              maxTicksLimit: 10,
-              color:  '#475569',
-              font:   { family: '"IBM Plex Mono"', size: 10 },
-            },
-            grid: { color: 'rgba(30, 41, 59, 0.8)' },
-            border: { color: '#1e293b' },
-          },
-          y: {
-            ticks: {
-              color: '#475569',
-              font:  { family: '"IBM Plex Mono"', size: 10 },
-              callback: v => '$' + v.toLocaleString(),
-            },
-            grid:   { color: 'rgba(30, 41, 59, 0.8)' },
-            border: { color: '#1e293b' },
-          }
-        }
-      }
-    });
-  </script>
-
+  <script src="{{ url_for('static', filename='js/stockviewer.js') }}"></script>
 </body>
 </html>

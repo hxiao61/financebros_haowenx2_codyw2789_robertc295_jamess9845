@@ -1,142 +1,85 @@
-window.onload = function(){
-    tick()
-    setInterval(tick, 1000)
-    loadWatchlist()
-    loadMarketSummary()
-    var fivemin = 5 * 60 * 1000
-    setInterval(loadWatchlist, fivemin)
+const TOP_STOCKS = [
+  "AAPL","MSFT","NVDA","GOOGL","AMZN",
+  "META","TSLA","AVGO","JPM","V",
+  "WMT","XOM","MA","COST","NFLX"
+];
+
+function tick() {
+  document.getElementById("clock").textContent =
+    new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-function searchStock() {
-    var searchBox = document.getElementById("navbar-search")
-    var query = searchBox.value
-    query = query.toUpperCase()
-
-    fetch("/api/stocks/search?q=" + query)
-    .then(function(response){
-        return response.json()
-    })
-    .then(function(result){
-        var resultSpan = document.getElementById("search-result")
-        resultSpan.innerText = result.name + "- $" + result.price
-    })
+function fmtChange(pct) {
+  const up  = pct >= 0;
+  const cls = up ? "text-emerald-400" : "text-red-400";
+  const sym = up ? "▲" : "▼";
+  return { cls, text: `${sym} ${Math.abs(pct).toFixed(2)}%` };
 }
 
-    function tick() {
-      document.getElementById("clock").textContent =
-        new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    }
+async function fetchQuote(ticker) {
+  const res  = await fetch(`/api/stocks/price?ticker=${ticker}`);
+  const data = await res.json();
 
-    function fmtChange(pct) {
-      const up  = pct >= 0;
-      const cls = up ? "text-emerald-400" : "text-red-400";
-      const sym = up ? "▲" : "▼";
-      return { cls, text: `${sym} ${Math.abs(pct).toFixed(2)}%` };
-    }
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
 
-    async function loadMarketSummary() {
-      try {
-        const res  = await fetch("/dashboard_data");
-        const data = await res.json();
-        const ids  = { "S&P 500": "sp500", "NASDAQ": "nasdaq", "DOW": "dow" };
+  if (data.price === null) {
+    set(`price-${ticker}`, "N/A");
+    set(`chg-${ticker}`,   "—");
+    set(`open-${ticker}`,  "N/A");
+    set(`high-${ticker}`,  "N/A");
+    set(`low-${ticker}`,   "N/A");
+    set(`vol-${ticker}`,   "N/A");
+    return;
+  }
 
-        for (const card of data.market_summary) {
-          const key = ids[card.name]; if (!key) continue;
-          const pe  = document.getElementById(`${key}-price`);
-          const ce  = document.getElementById(`${key}-change`);
-          if (card.price !== null) {
-            pe.textContent = `$${card.price.toLocaleString()}`;
-            const { cls, text } = fmtChange(card.change_pct);
-            ce.textContent  = text;
-            ce.className    = `font-mono text-xs mt-1 ${cls}`;
-          } else {
-            pe.textContent = "N/A"; ce.textContent = "—";
-          }
-        }
-      } catch (e) { console.error("Market error:", e); }
-    }
+  set(`price-${ticker}`, `$${data.price.toFixed(2)}`);
+  set(`open-${ticker}`,  data.open   != null ? `$${data.open.toFixed(2)}`  : "N/A");
+  set(`high-${ticker}`,  data.high   != null ? `$${data.high.toFixed(2)}`  : "N/A");
+  set(`low-${ticker}`,   data.low    != null ? `$${data.low.toFixed(2)}`   : "N/A");
+  set(`vol-${ticker}`,   data.volume != null ? data.volume.toLocaleString() : "N/A");
 
-    // ── Watchlist ──
-    async function loadWatchlist() {
-      const body = document.getElementById("watchlist-body");
-      const cnt  = document.getElementById("watchlist-count");
-      try {
-        const res  = await fetch("/api/watchlist");
-        const data = await res.json();
+  if (data.change_pct != null) {
+    const chgEl = document.getElementById(`chg-${ticker}`);
+    const { cls, text } = fmtChange(data.change_pct);
+    if (chgEl) { chgEl.textContent = text; chgEl.className = `font-mono text-xs text-right px-5 py-3 ${cls}`; }
+  } else {
+    set(`chg-${ticker}`, "—");
+  }
+}
 
-        body.innerHTML = "";
-        if (!data.tickers?.length) {
-          cnt.textContent = "";
-          body.innerHTML  = `<tr><td colspan="4" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">No tickers saved — add one above</td></tr>`;
-          return;
-        }
+async function loadTopStocks() {
+  const body = document.getElementById("stockviewer-body");
+  body.innerHTML = "";
 
-        cnt.textContent = `${data.tickers.length} ticker${data.tickers.length !== 1 ? "s" : ""}`;
+  for (const ticker of TOP_STOCKS) {
+    const row = document.createElement("tr");
+    row.className = "border-t border-slate-800/70";
+    row.innerHTML = `
+      <td class="font-mono text-sm font-medium text-sky-400 px-5 py-3">${ticker}</td>
+      <td class="font-mono text-sm text-slate-200 text-right px-5 py-3" id="price-${ticker}"><span class="text-slate-700 text-xs">…</span></td>
+      <td class="font-mono text-xs text-right px-5 py-3" id="chg-${ticker}">—</td>
+      <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="open-${ticker}">…</td>
+      <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="high-${ticker}">…</td>
+      <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="low-${ticker}">…</td>
+      <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="vol-${ticker}">…</td>
+      <td class="text-right px-5 py-3">
+        <a href="#" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">View →</a>
+      </td>`;
+    body.appendChild(row);
+  }
 
-        for (const ticker of data.tickers) {
-          const row = document.createElement("tr");
-          row.id    = `row-${ticker}`;
-          row.className = "border-t border-slate-800/70 transition-colors";
-          row.innerHTML = `
-            <td class="font-mono text-sm font-medium text-sky-400 px-5 py-3">${ticker}</td>
-            <td class="font-mono text-sm text-slate-200 text-right px-5 py-3" id="price-${ticker}">
-              <span class="text-slate-700 text-xs">…</span>
-            </td>
-            <td class="font-mono text-xs text-slate-600 text-right px-5 py-3" id="chg-${ticker}">—</td>
-            <td class="text-right px-5 py-3">
-              <button onclick="removeStock('${ticker}')"
-                class="font-mono text-xs text-slate-700 hover:text-red-400 transition-colors uppercase tracking-widest">
-                ✕ Remove
-              </button>
-            </td>`;
-          body.appendChild(row);
-          fetchQuote(ticker);
-        }
-      } catch (e) { console.error("Watchlist error:", e); }
-    }
+  await Promise.all(TOP_STOCKS.map(fetchQuote));
 
-    async function fetchQuote(ticker) {
-      try {
-        const res  = await fetch(`/api/stocks/price?ticker=${ticker}`);
-        const data = await res.json();
-        if (data.error) return;
-        const pe = document.getElementById(`price-${ticker}`);
-        const ce = document.getElementById(`chg-${ticker}`);
-        if (pe) pe.textContent = `$${data.price.toFixed(2)}`;
-        if (ce) {
-          const { cls, text } = fmtChange(data.change_pct);
-          ce.textContent = text;
-          ce.className   = `font-mono text-xs text-right px-5 py-3 ${cls}`;
-        }
-      } catch (e) { console.error(`Quote error ${ticker}:`, e); }
-    }
+  document.getElementById("last-updated").textContent =
+    new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
 
-    async function addStock() {
-      const input  = document.getElementById("add-ticker");
-      const ticker = input.value.trim().toUpperCase();
-      if (!ticker) return;
-      try {
-        const res  = await fetch("/api/watchlist/add", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticker }),
-        });
-        const data = await res.json();
-        if (data.error) { alert(data.error); return; }
-        input.value = "";
-        loadWatchlist();
-      } catch (e) { console.error("Add error:", e); }
-    }
-
-    async function removeStock(ticker) {
-      try {
-        await fetch("/api/watchlist/remove", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticker }),
-        });
-        loadWatchlist();
-      } catch (e) { console.error("Remove error:", e); }
-    }
-
-    document.getElementById("add-ticker").addEventListener("keydown", e => {
-      if (e.key === "Enter") addStock();
-    });
+window.onload = function () {
+  tick();
+  setInterval(tick, 1000);
+  loadTopStocks();
+  setInterval(loadTopStocks, 2 * 60 * 1000);
+};

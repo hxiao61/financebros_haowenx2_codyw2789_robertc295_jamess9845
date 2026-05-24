@@ -290,33 +290,32 @@ def stock_price():
     ticker = request.args.get("ticker")
     ticker = ticker.upper()
 
-    # hist = get_history_cached(ticker, period="1mo")
-    hist = get_latest_history(ticker)
+    try:
+        fi = yf.Ticker(ticker).fast_info
+        price = fi.last_price
+        prev_close = fi.previous_close
 
-    if hist is None:
+        if price is None:
+            raise ValueError("no price")
+
+        change_pct = round((price - prev_close) / prev_close * 100, 2) if prev_close else None
+
+        return jsonify({
+            "ticker":     ticker,
+            "price":      round(price, 2),
+            "change_pct": change_pct,
+            "open":       round(fi.open, 2)        if fi.open       else None,
+            "high":       round(fi.day_high, 2)    if fi.day_high   else None,
+            "low":        round(fi.day_low, 2)     if fi.day_low    else None,
+            "volume":     int(fi.last_volume)      if fi.last_volume else None,
+        })
+    except Exception:
         return jsonify({
             "ticker": ticker,
-            "price": None,
-            "change_pct": None,
-            "open": None,
-            "high": None,
-            "low": None,
-            "volume": None,
+            "price": None, "change_pct": None,
+            "open": None, "high": None, "low": None, "volume": None,
         })
 
-    latest = float(hist["Close"].iloc[-1])
-    prev = float(hist["Close"].iloc[-2])
-    change_pct = round((latest - prev) / prev * 100, 2)
-
-    return jsonify({
-        "ticker": ticker,
-        "price": round(latest, 2),
-        "change_pct" : change_pct,
-        "open": round(float(hist["Open"].iloc[-1]), 2),
-        "high": round(float(hist["High"].iloc[-1]), 2),
-        "low": round(float(hist["Low"].iloc[-1]), 2),
-        "volume": round(float(hist["Volume"].iloc[-1]), 2),
-    })
 
 @app.route("/api/stocks/search")
 @login_required
