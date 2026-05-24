@@ -54,6 +54,7 @@ function searchStock() {
             pe.textContent = "N/A"; ce.textContent = "—";
           }
         }
+        document.getElementById("last-updated").textContent = "Updated " + new Date().toLocaleTimeString();
       } catch (e) { console.error("Market error:", e); }
     }
 
