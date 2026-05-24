@@ -3,8 +3,9 @@ window.onload = function(){
     setInterval(tick, 1000)
     loadWatchlist()
     loadMarketSummary()
-    var fivemin = 5 * 60 * 1000
-    setInterval(loadWatchlist, fivemin)
+    var twoMin = 2 * 60 * 1000
+    setInterval(loadWatchlist, twoMin)
+    setInterval(loadMarketSummary, twoMin)
 }
 
 function searchStock() {
@@ -110,7 +111,7 @@ function searchStock() {
       try {
         const res  = await fetch(`/api/stocks/price?ticker=${ticker}`);
         const data = await res.json();
-        if (data.error) return;
+        if (data.price === null) return;
         const pe = document.getElementById(`price-${ticker}`);
         const ce = document.getElementById(`chg-${ticker}`);
         if (pe) pe.textContent = `$${data.price.toFixed(2)}`;

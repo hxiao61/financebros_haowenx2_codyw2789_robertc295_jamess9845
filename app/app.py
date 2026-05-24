@@ -30,6 +30,12 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "financebros")
 
 
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "proto" / "stock_model.pkl"
+MODELS_DIR = BASE_DIR / "proto" / "models"
+with MODEL_PATH.open("rb") as f:
+    default_model = pickle.load(f)
+
 def get_history(ticker: str, period: str = "6mo"):
     df = yf.Ticker(ticker).history(period=period)
     if df.empty:
@@ -108,7 +114,10 @@ def get_dashboard_context():
     cards = []
     for name, sym in indices.items():
         try:
-            hist       = get_history_cached(sym, period="1mo")
+            hist       = get_latest_history(sym)
+            if hist is None:
+                cards.append({"name": name, "ticker": sym, "price": None, "change_pct": None})
+                continue
             latest     = float(hist["Close"].iloc[-1])
             prev       = float(hist["Close"].iloc[-2])
             change_pct = round((latest - prev) / prev * 100, 2)
@@ -213,10 +222,66 @@ def forecast():
 # DEMO
 # ---------------------------------------------------------------
 
-@app.route("/demo")
+@app.route("/api/predict", methods=["POST"])
 @login_required
-def demo():
-    return render_template("demo.html", user=session["user"], active="demo")
+def predict():
+    data = request.get_json(silent=True) or {}
+    ticker = str(data.get("ticker", "NVDA")).strip().upper()
+
+    try:
+        model, model_source = get_model_for_ticker(ticker)
+        history = get_history_cached(ticker, period="6mo")
+        x = build_features(history)
+        predicted_open = float(model.predict(x)[0])
+
+        opens = history["Open"]
+        labels = []
+        actual = []
+        for date in opens.index:
+            labels.append(date.strftime("%Y-%m-%d"))
+            actual.append(float(opens[date]))
+
+        rolling_labels, rolling_preds = rolling_predictions_with_model(history, model)
+        rolling_map = {}
+        for i in range(len(rolling_labels)):
+            rolling_map[rolling_labels[i]] = rolling_preds[i]
+
+        rolling_series = []
+        for label in labels:
+            if label in rolling_map:
+                rolling_series.append(rolling_map[label])
+            else:
+                rolling_series.append(None)
+
+        last_open = float(history["Open"].iloc[-1])
+        delta = predicted_open - last_open
+        if last_open != 0:
+            delta_pct = (delta / last_open) * 100
+        else:
+            delta_pct = 0.0
+
+        prediction_line = [None] * len(actual)
+        prediction_line.append(predicted_open)
+
+        labels.append("Next Day (Pred)")
+        actual.append(None)
+        rolling_series.append(None)
+
+        return jsonify({
+            "ticker": ticker,
+            "labels": labels,
+            "actual": actual,
+            "rolling_prediction": rolling_series,
+            "prediction": prediction_line,
+            "predicted_open": round(predicted_open, 4),
+            "last_open": round(last_open, 4),
+            "delta": round(delta, 4),
+            "delta_pct": round(delta_pct, 4),
+            "model_source": model_source,
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 # STOCK DATA
 @app.route("/api/stocks/price")
@@ -225,8 +290,20 @@ def stock_price():
     ticker = request.args.get("ticker")
     ticker = ticker.upper()
 
-    hist = get_history_cached(ticker, period="1mo")
-    # hist = yf.Ticker(ticker).history(period="1d", interval="5m")
+    # hist = get_history_cached(ticker, period="1mo")
+    hist = get_latest_history(ticker)
+
+    if hist is None:
+        return jsonify({
+            "ticker": ticker,
+            "price": None,
+            "change_pct": None,
+            "open": None,
+            "high": None,
+            "low": None,
+            "volume": None,
+        })
+
     latest = float(hist["Close"].iloc[-1])
     prev = float(hist["Close"].iloc[-2])
     change_pct = round((latest - prev) / prev * 100, 2)
@@ -249,7 +326,15 @@ def stock_search():
 
     stock_info = yf.Ticker(query).info
     name = stock_info.get("longName")
-    hist = get_history_cached(query, period="1mo")
+    hist = get_latest_history(query)
+
+    if hist is None:
+        return jsonify({
+            "ticker": query,
+            "name": name,
+            "price": None,
+        })
+
     latest = float(hist["Close"].iloc[-1])
 
     return jsonify({
@@ -258,7 +343,15 @@ def stock_search():
         "price": round(latest, 2),
     })
 
-
+def get_latest_history(ticker: str):
+    hist = yf.Ticker(ticker).history(period="1d", interval="2m")
+    if not hist.empty and len(hist) >= 2:
+        return hist
+    month_hist = get_history_cached(ticker, period="1mo")
+    if not month_hist.empty and len(month_hist)>= 2:
+        return month_hist
+    return None
+        
 # WATCHLIST
 
 
@@ -322,8 +415,11 @@ def portfolio():
 
     for r in rows:
         try:
-            hist  = get_history_cached(r["ticker"], period="1mo")
-            price = float(hist["Close"].iloc[-1])
+            hist = get_latest_history(r["ticker"])
+            if hist is None:
+                price = None
+            else:
+                price = float(hist["Close"].iloc[-1])
         except Exception:
             price = None
 

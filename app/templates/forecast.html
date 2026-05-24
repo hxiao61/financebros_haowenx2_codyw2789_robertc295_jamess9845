@@ -1,13 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <title>Blossomberg: Forecast</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction Forecast</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
   {% include "navbar.html" %}
-  <p>Replaces Demo, gives more forecast on more stocks</p>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+      <h2 class="text-xl font-bold text-gray-800">Prediction Demo</h2>
+      <input id="ticker" value="NVDA" maxlength="8"
+             class="border border-gray-300 rounded px-3 py-2 w-28" />
+      <button id="run" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Run
+      </button>
+    </div>
+
+    <div class="mb-3 flex flex-wrap gap-2">
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AAPL">AAPL</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="MSFT">MSFT</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="NVDA">NVDA</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AMZN">AMZN</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="META">META</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="GOOGL">GOOGL</button>
+      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="TSLA">TSLA</button>
+    </div>
+
+    <div id="meta" class="text-sm text-gray-600 mb-2"></div>
+    <div id="error" class="text-sm text-red-600 mb-2"></div>
+
+    <div class="bg-white rounded shadow p-4">
+      <canvas id="chart" style="height:360px;"></canvas>
+    </div>
+  </main>
+  <script src="/static/js/demo.js"></script>
 </body>
 </html>
