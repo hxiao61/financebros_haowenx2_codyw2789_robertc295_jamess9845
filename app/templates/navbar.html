@@ -1,33 +1,46 @@
-<!-- Simple navbar for logged-in users -->
-<nav class="bg-blue-600 text-white shadow">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-    <a href="{{ url_for('dashboard') }}" class="text-lg font-bold hover:text-blue-100">
-      Blossomberg
+<nav class="border-b border-slate-800" style="background-color: #060d1b;">
+  <div class="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+
+    <a href="{{ url_for('dashboard') }}" class="font-mono text-sm font-semibold text-sky-400 tracking-widest uppercase hover:text-sky-300 transition-colors">
+      // Blossomberg
     </a>
 
-    <div class="flex flex-wrap items-center gap-4 text-sm">
+    <div class="flex flex-wrap items-center gap-6 text-sm">
       <a href="{{ url_for('dashboard') }}"
-         class="hover:text-blue-100 {% if active == 'dashboard' %}underline font-semibold{% endif %}">
+         class="font-mono text-xs uppercase tracking-widest transition-colors
+                {% if active == 'dashboard' %}text-sky-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
         Dashboard
       </a>
       <a href="{{ url_for('forecast') }}"
-         class="hover:text-blue-100 {% if active == 'forecast' %}underline font-semibold{% endif %}">
+         class="font-mono text-xs uppercase tracking-widest transition-colors
+                {% if active == 'forecast' %}text-sky-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
         Forecast
       </a>
-      <a href="{{ url_for('aianalysis')}}"
-        class="hover:text-blue-100 {% if active == 'aianalysis' %}underline font-semibold{% endif %}">
+      <a href="{{ url_for('aianalysis') }}"
+         class="font-mono text-xs uppercase tracking-widest transition-colors
+                {% if active == 'aianalysis' %}text-sky-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
         AI Analysis
       </a>
-      <a href="{{ url_for('stockviewer')}}"
-        class="hover:text-blue-100 {% if active == 'stockviewer' %}underline font-semibold{% endif %}">
+      <a href="{{ url_for('stockviewer') }}"
+         class="font-mono text-xs uppercase tracking-widest transition-colors
+                {% if active == 'stockviewer' %}text-sky-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
         Stocks
       </a>
-      <input id = "navbar-search" type="text" placeholder="Search for Ticker" class="px-2 py-1 rounded text-black">
-      <button onclick="searchStock()">Search</button>
-      <span id="search-result"></span>
-      <span class="text-blue-200">Hi, {{ user }}</span>
+
+      <div class="flex items-center gap-2">
+        <input id="navbar-search" type="text" placeholder="Search ticker…"
+               class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-xs text-slate-200 px-3 py-1.5 w-36 uppercase tracking-widest outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600">
+        <button onclick="searchStock()"
+                class="font-mono text-xs uppercase tracking-widest text-slate-500 hover:text-sky-400 transition-colors px-2 py-1.5">
+          Go
+        </button>
+        <span id="search-result" class="font-mono text-xs text-slate-400"></span>
+      </div>
+
+      <span class="font-mono text-xs text-slate-600 uppercase tracking-widest">{{ user }}</span>
+
       <a href="{{ url_for('logout') }}"
-         class="bg-blue-800 hover:bg-blue-900 px-3 py-1 rounded">
+         class="font-mono text-xs uppercase tracking-widest text-slate-600 hover:text-red-400 transition-colors">
         Logout
       </a>
     </div>

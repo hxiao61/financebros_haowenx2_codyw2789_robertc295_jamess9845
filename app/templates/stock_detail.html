@@ -6,66 +6,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.35s ease both; }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.10s; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+
+<body class="min-h-screen font-sans text-slate-200">
+
   {% include "navbar.html" %}
 
-  <div class="max-w-5xl mx-auto px-4 py-8">
+  <main class="max-w-5xl mx-auto px-6 py-10">
 
-    <div class="flex items-center gap-4 mb-6">
-      <a href="/stockviewer" class="text-sm text-gray-500 hover:text-gray-700">← Back</a>
-      <h1 class="text-2xl font-bold text-gray-800">{{ ticker }}</h1>
-      <span id="badge-change" class="text-sm font-medium px-2 py-1 rounded"></span>
+    <!-- Header -->
+    <div class="fade-up flex items-center gap-4 border-b border-slate-800 pb-6 mb-8">
+      <a href="/stockviewer" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">← Back</a>
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-0.5">// stock detail</p>
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">{{ ticker }}</h1>
+      </div>
+      <span id="badge-change" class="font-mono text-xs px-2 py-1 rounded-sm border"></span>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-6">
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Price</p>
-        <p id="stat-price" class="text-xl font-bold text-gray-800">—</p>
+    <!-- Stat cards -->
+    <div class="fade-up delay-1 grid grid-cols-2 sm:grid-cols-6 gap-4 mb-8">
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3 border-l-2 border-l-sky-500">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Price</p>
+        <p id="stat-price" class="font-mono text-lg font-semibold text-slate-100">—</p>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Change</p>
-        <p id="stat-change" class="text-xl font-bold">—</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Change</p>
+        <p id="stat-change" class="font-mono text-lg font-semibold">—</p>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Open</p>
-        <p id="stat-open" class="text-xl font-bold text-gray-800">—</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Open</p>
+        <p id="stat-open" class="font-mono text-lg font-semibold text-slate-100">—</p>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Volume</p>
-        <p id="stat-vol" class="text-xl font-bold text-gray-800">—</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Volume</p>
+        <p id="stat-vol" class="font-mono text-lg font-semibold text-slate-100">—</p>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Day High</p>
-        <p id="stat-high" class="text-xl font-bold text-gray-800">—</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Day High</p>
+        <p id="stat-high" class="font-mono text-lg font-semibold text-emerald-400">—</p>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <p class="text-xs text-gray-500 mb-1">Day Low</p>
-        <p id="stat-low" class="text-xl font-bold text-gray-800">—</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Day Low</p>
+        <p id="stat-low" class="font-mono text-lg font-semibold text-red-400">—</p>
       </div>
     </div>
 
-    <!-- 2x2 Grid of Charts -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white rounded shadow p-4">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Price History (1Y)</h3>
+    <!-- Charts 2x2 -->
+    <div class="fade-up delay-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Price History (1Y)</h3>
         <div class="h-64"><canvas id="priceChart"></canvas></div>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Indexed Growth Comparison</h3>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Indexed Growth Comparison</h3>
         <div class="h-64"><canvas id="growthChart"></canvas></div>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Monthly Trading Volume</h3>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Monthly Trading Volume</h3>
         <div class="h-64"><canvas id="volumeChart"></canvas></div>
       </div>
-      <div class="bg-white rounded shadow p-4">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Sharpe Ratio Comparison (2Y)</h3>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Sharpe Ratio Comparison (2Y)</h3>
         <div class="h-64"><canvas id="sharpeChart"></canvas></div>
       </div>
     </div>
 
-  </div>
+  </main>
 
   <script>
     const TICKER = "{{ ticker }}";
@@ -76,149 +106,106 @@
       if (d.price == null) return;
 
       document.getElementById("stat-price").textContent = `$${d.price.toFixed(2)}`;
-      document.getElementById("stat-open").textContent  = d.open   != null ? `$${d.open.toFixed(2)}`  : "N/A";
-      document.getElementById("stat-high").textContent  = d.high   != null ? `$${d.high.toFixed(2)}`  : "N/A";
-      document.getElementById("stat-low").textContent   = d.low    != null ? `$${d.low.toFixed(2)}`   : "N/A";
+      document.getElementById("stat-open").textContent  = d.open   != null ? `$${d.open.toFixed(2)}`   : "N/A";
+      document.getElementById("stat-high").textContent  = d.high   != null ? `$${d.high.toFixed(2)}`   : "N/A";
+      document.getElementById("stat-low").textContent   = d.low    != null ? `$${d.low.toFixed(2)}`    : "N/A";
       document.getElementById("stat-vol").textContent   = d.volume != null ? d.volume.toLocaleString() : "N/A";
 
       if (d.change_pct != null) {
         const up = d.change_pct >= 0;
         const el = document.getElementById("stat-change");
         el.textContent = `${up ? "▲" : "▼"} ${Math.abs(d.change_pct).toFixed(2)}%`;
-        el.className = `text-xl font-bold ${up ? "text-green-600" : "text-red-600"}`;
+        el.className = `font-mono text-lg font-semibold ${up ? "text-emerald-400" : "text-red-400"}`;
         const badge = document.getElementById("badge-change");
         badge.textContent = el.textContent;
-        badge.className = `text-sm font-medium px-2 py-1 rounded ${up ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`;
+        badge.className = `font-mono text-xs px-2 py-1 rounded-sm border ${up ? "border-emerald-800 text-emerald-400" : "border-red-800 text-red-400"}`;
       }
     }
 
     async function loadAllCharts() {
       try {
-        const res = await fetch(`/api/stocks/modal_data?ticker=${TICKER}`);
+        const res  = await fetch(`/api/stocks/modal_data?ticker=${TICKER}`);
         const swag = await res.json();
         if (swag.error) return;
 
+        const GRID = "rgba(30, 41, 59, 0.8)";
+        const TICK = "#475569";
+        const FONT = { family: '"IBM Plex Mono"', size: 10 };
+
+        const baseScales = {
+          x: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT } },
+          y: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT } }
+        };
+
         // 1. Price History
-        const ctxPrice = document.getElementById("priceChart").getContext("2d");
-        const isUp = swag.price_closes[swag.price_closes.length - 1] >= swag.price_closes[0];
-        const priceColor = isUp ? "#10b981" : "#ef4444";
-        new Chart(ctxPrice, {
+        const isUp = swag.price_closes.at(-1) >= swag.price_closes[0];
+        new Chart(document.getElementById("priceChart"), {
           type: "line",
           data: {
             labels: swag.price_labels,
-            datasets: [{
-              label: `${TICKER} Price`,
-              data: swag.price_closes,
-              borderColor: priceColor,
-              borderWidth: 2,
-              pointRadius: 0,
-              tension: 0.1,
-              fill: false
-            }]
+            datasets: [{ label: `${TICKER} Price`, data: swag.price_closes,
+              borderColor: isUp ? "#10b981" : "#ef4444", borderWidth: 2,
+              pointRadius: 0, tension: 0.1, fill: false }]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
+          options: { responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280", maxTicksLimit: 10 } },
-              y: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280", callback: v => "$" + v } }
+            scales: { ...baseScales,
+              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => "$" + v } }
             }
           }
         });
 
         // 2. Growth Comparison
-        const ctxGrowth = document.getElementById("growthChart").getContext("2d");
-        const colors = [
-          "#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#06b6d4"
-        ];
-        const growthDatasets = swag.growth_datasets.map((dataset, idx) => {
-          const isSelected = dataset.ticker === TICKER;
-          return {
-            label: dataset.ticker,
-            data: dataset.data,
-            borderColor: isSelected ? "#0284c7" : colors[idx % colors.length],
-            borderWidth: isSelected ? 3 : 1.5,
-            pointRadius: 0,
-            tension: 0.1,
-            fill: false
-          };
-        });
-        new Chart(ctxGrowth, {
+        const colors = ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4"];
+        new Chart(document.getElementById("growthChart"), {
           type: "line",
           data: {
             labels: swag.monthly_labels,
-            datasets: growthDatasets
+            datasets: swag.growth_datasets.map((ds, i) => ({
+              label: ds.ticker, data: ds.data,
+              borderColor: ds.ticker === TICKER ? "#38bdf8" : colors[i % colors.length],
+              borderWidth: ds.ticker === TICKER ? 3 : 1.5,
+              pointRadius: 0, tension: 0.1, fill: false
+            }))
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: "#4b5563" } } },
-            scales: {
-              x: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280" } },
-              y: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280", callback: v => v + "%" } }
+          options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: TICK, font: FONT } } },
+            scales: { ...baseScales,
+              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => v + "%" } }
             }
           }
         });
 
         // 3. Monthly Volume
-        const ctxVolume = document.getElementById("volumeChart").getContext("2d");
-        new Chart(ctxVolume, {
+        new Chart(document.getElementById("volumeChart"), {
           type: "bar",
-          data: {
-            labels: swag.monthly_labels,
-            datasets: [{
-              label: "Avg Vol",
-              data: swag.monthly_volume,
-              backgroundColor: "#4f46e5"
-            }]
+          data: { labels: swag.monthly_labels,
+            datasets: [{ label: "Avg Vol", data: swag.monthly_volume, backgroundColor: "#4f46e5" }]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
+          options: { responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280" } },
-              y: {
-                grid: { color: "#f3f4f6" },
-                ticks: {
-                  color: "#6b7280",
-                  callback: v => Intl.NumberFormat("en-US", { notation: "compact" }).format(v)
-                }
-              }
+            scales: { ...baseScales,
+              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks,
+                callback: v => Intl.NumberFormat("en-US", { notation: "compact" }).format(v) } }
             }
           }
         });
 
-        // 4. Sharpe Ratio Comparison
-        const ctxSharpe = document.getElementById("sharpeChart").getContext("2d");
-        const sharpeLabels = swag.sharpe_data.map(d => d.ticker);
-        const sharpeRatios = swag.sharpe_data.map(d => d.sharpe_ratio);
-        const sharpeColors = swag.sharpe_data.map(d => d.ticker === TICKER ? "#10b981" : "#9ca3af");
-        new Chart(ctxSharpe, {
+        // 4. Sharpe Ratio
+        new Chart(document.getElementById("sharpeChart"), {
           type: "bar",
           data: {
-            labels: sharpeLabels,
-            datasets: [{
-              label: "Sharpe Ratio",
-              data: sharpeRatios,
-              backgroundColor: sharpeColors
-            }]
+            labels: swag.sharpe_data.map(d => d.ticker),
+            datasets: [{ label: "Sharpe Ratio", data: swag.sharpe_data.map(d => d.sharpe_ratio),
+              backgroundColor: swag.sharpe_data.map(d => d.ticker === TICKER ? "#10b981" : "#334155") }]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
+          options: { responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280" } },
-              y: { grid: { color: "#f3f4f6" }, ticks: { color: "#6b7280" } }
-            }
+            scales: baseScales
           }
         });
 
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
     loadQuote();

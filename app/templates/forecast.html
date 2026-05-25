@@ -1,42 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prediction Forecast</title>
+  <title>Forecast — Blossomberg</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.35s ease both; }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.10s; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+
+<body class="min-h-screen font-sans text-slate-200">
+
   {% include "navbar.html" %}
 
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <div class="flex flex-wrap items-center gap-3 mb-4">
-      <h2 class="text-xl font-bold text-gray-800">Prediction Demo</h2>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+
+    <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// ml engine</p>
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">Prediction Demo</h1>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="fade-up delay-1 flex flex-wrap items-center gap-3 mb-4">
       <input id="ticker" value="NVDA" maxlength="8"
-             class="border border-gray-300 rounded px-3 py-2 w-28" />
-      <button id="run" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+             class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-sm text-slate-200 px-3 py-2 w-28 uppercase tracking-widest outline-none transition-colors">
+      <button id="run"
+              class="bg-sky-700 hover:bg-sky-600 text-white font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-colors">
         Run
       </button>
     </div>
 
-    <div class="mb-3 flex flex-wrap gap-2">
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AAPL">AAPL</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="MSFT">MSFT</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="NVDA">NVDA</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AMZN">AMZN</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="META">META</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="GOOGL">GOOGL</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="TSLA">TSLA</button>
+    <!-- Quick tickers -->
+    <div class="fade-up delay-1 flex flex-wrap gap-2 mb-6">
+      {% for t in ['AAPL','MSFT','NVDA','AMZN','META','GOOGL','TSLA'] %}
+      <button class="quick-ticker font-mono text-xs uppercase tracking-widest border border-slate-700 bg-slate-900 hover:border-sky-600 hover:text-sky-400 text-slate-500 px-3 py-1 rounded-sm transition-colors" data-ticker="{{ t }}">
+        {{ t }}
+      </button>
+      {% endfor %}
     </div>
 
-    <div id="meta" class="text-sm text-gray-600 mb-2"></div>
-    <div id="error" class="text-sm text-red-600 mb-2"></div>
+    <div id="meta" class="font-mono text-xs text-slate-500 mb-1"></div>
+    <div id="error" class="font-mono text-xs text-red-400 mb-2"></div>
 
-    <div class="bg-white rounded shadow p-4">
+    <!-- Chart -->
+    <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm p-6">
       <canvas id="chart" style="height:360px;"></canvas>
     </div>
+
   </main>
+
   <script src="/static/js/demo.js"></script>
 </body>
 </html>

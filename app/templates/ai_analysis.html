@@ -1,38 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Blossomberg: AI Analysis</title>
+  <title>AI Analysis — Blossomberg</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.35s ease both; }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.10s; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+
+<body class="min-h-screen font-sans text-slate-200">
+
   {% include "navbar.html" %}
 
-  <div class="max-w-2xl mx-auto px-4 py-10">
-    <h1 class="text-xl font-bold text-gray-800 mb-1">AI Stock Analysis</h1>
-    <p class="text-sm text-gray-500 mb-6">Ask anything about stocks, markets, or companies.</p>
+  <main class="max-w-3xl mx-auto px-6 py-10">
 
-    <div class="flex gap-2 mb-4">
+    <div class="fade-up border-b border-slate-800 pb-6 mb-8">
+      <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// ai engine</p>
+      <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">AI Stock Analysis</h1>
+      <p class="font-mono text-xs text-slate-600 mt-1 uppercase tracking-widest">Ask anything about stocks, markets, or companies</p>
+    </div>
+
+    <!-- Input -->
+    <div class="fade-up delay-1 flex gap-2 mb-4">
       <input id="question" type="text" placeholder='e.g. "Why did NVDA rise today?"'
-        class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+             class="flex-1 bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-sm text-slate-200 px-3 py-2 outline-none transition-colors placeholder:text-slate-700 placeholder:font-sans placeholder:normal-case placeholder:tracking-normal">
       <button id="ask-btn" onclick="askAI()"
-        class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+              class="bg-sky-700 hover:bg-sky-600 text-white font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-colors">
         Ask
       </button>
     </div>
 
-    <div class="flex gap-2 flex-wrap mb-6">
-      <button onclick="setQ('Why did NVDA rise today?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Why did NVDA rise today?</button>
-      <button onclick="setQ('What is the outlook for AAPL?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Outlook for AAPL?</button>
-      <button onclick="setQ('Explain what the S&P 500 is')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">What is the S&P 500?</button>
-      <button onclick="setQ('Is TSLA a good investment right now?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Is TSLA a good investment?</button>
+    <!-- Suggestions -->
+    <div class="fade-up delay-1 flex gap-2 flex-wrap mb-8">
+      <button onclick="setQ('Why did NVDA rise today?')"            class="font-mono text-xs border border-slate-700 bg-slate-900 hover:border-sky-600 hover:text-sky-400 text-slate-500 px-3 py-1 rounded-sm transition-colors">Why did NVDA rise?</button>
+      <button onclick="setQ('What is the outlook for AAPL?')"       class="font-mono text-xs border border-slate-700 bg-slate-900 hover:border-sky-600 hover:text-sky-400 text-slate-500 px-3 py-1 rounded-sm transition-colors">Outlook for AAPL?</button>
+      <button onclick="setQ('Explain what the S&P 500 is')"         class="font-mono text-xs border border-slate-700 bg-slate-900 hover:border-sky-600 hover:text-sky-400 text-slate-500 px-3 py-1 rounded-sm transition-colors">What is the S&P 500?</button>
+      <button onclick="setQ('Is TSLA a good investment right now?')" class="font-mono text-xs border border-slate-700 bg-slate-900 hover:border-sky-600 hover:text-sky-400 text-slate-500 px-3 py-1 rounded-sm transition-colors">Is TSLA a good buy?</button>
     </div>
 
-    <div id="answer-box" class="hidden bg-white border border-gray-200 rounded p-4 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed"></div>
-    <div id="loading" class="hidden text-sm text-gray-400">Thinking…</div>
-    <div id="error-box" class="hidden text-sm text-red-500 mt-2"></div>
-  </div>
+    <!-- Output -->
+    <div class="fade-up delay-2">
+      <div id="loading" class="hidden font-mono text-xs text-slate-600 uppercase tracking-widest">Thinking…</div>
+      <div id="error-box" class="hidden font-mono text-xs text-red-400 mt-2"></div>
+      <div id="answer-box" class="hidden bg-slate-900 border border-slate-800 rounded-sm px-6 py-5 font-mono text-sm text-slate-300 whitespace-pre-wrap leading-relaxed border-l-2 border-l-sky-500"></div>
+    </div>
+
+  </main>
 
   <script>
     function setQ(text) {
@@ -48,7 +83,7 @@
       document.getElementById("error-box").classList.add("hidden");
       document.getElementById("loading").classList.remove("hidden");
 
-      const res = await fetch("/api/ai", {
+      const res  = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: q })

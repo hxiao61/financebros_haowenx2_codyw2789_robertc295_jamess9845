@@ -60,7 +60,7 @@
             <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Low</th>
             <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">Volume</th>
             <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-center px-5 py-3">30d</th>
-            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3">View</th>
+            <th class="font-mono text-xs uppercase tracking-widest text-slate-500 text-right px-5 py-3 whitespace-nowrap">View</th>
           </tr>
         </thead>
         <tbody id="stockviewer-body">
@@ -85,19 +85,19 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-slate-950 p-4 border border-slate-800 rounded">
           <h3 class="font-mono text-sm text-slate-400 mb-2">Price History (1Y)</h3>
-          <canvas id="modalPriceChart" class="w-full h-64"></canvas>
+          <div class="relative h-48"><canvas id="modalPriceChart"></canvas></div>
         </div>
         <div class="bg-slate-950 p-4 border border-slate-800 rounded">
           <h3 class="font-mono text-sm text-slate-400 mb-2">Indexed Growth Comparison</h3>
-          <canvas id="modalGrowthChart" class="w-full h-64"></canvas>
+          <div class="relative h-48"><canvas id="modalGrowthChart"></canvas></div>
         </div>
         <div class="bg-slate-950 p-4 border border-slate-800 rounded">
           <h3 class="font-mono text-sm text-slate-400 mb-2">Monthly Trading Volume</h3>
-          <canvas id="modalVolumeChart" class="w-full h-64"></canvas>
+          <div class="relative h-48"><canvas id="modalVolumeChart"></canvas></div>
         </div>
         <div class="bg-slate-950 p-4 border border-slate-800 rounded">
           <h3 class="font-mono text-sm text-slate-400 mb-2">Sharpe Ratio Comparison</h3>
-          <canvas id="modalSharpeChart" class="w-full h-64"></canvas>
+          <div class="relative h-48"><canvas id="modalSharpeChart"></canvas></div>
         </div>
       </div>
     </div>

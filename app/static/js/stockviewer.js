@@ -108,8 +108,8 @@ async function loadTopStocks() {
       <td class="px-5 py-2">
         <canvas id="spark-${ticker}" width="120" height="40"></canvas>
       </td>
-      <td class="text-right px-5 py-3">
-        <button onclick="openStockModal('${ticker}')" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">View →</button>
+      <td class="text-right px-5 py-3 whitespace-nowrap">
+        <button onclick="openStockModal('${ticker}')" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest whitespace-nowrap">View →</button>
       </td>`;
     body.appendChild(row);
   }
