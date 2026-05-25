@@ -182,8 +182,7 @@ haowenX -- 2026-05-22 11:44
 codyW -- 2026-05-24 19:51
 - ai analysis live. free model goes crazy.
 - hardcoded openrouter key to bypass env issues.
-- added 30d sparklines, detail view, and pkl checks.
-- funny variable names throughout. type shit.
+- added error handeling, detail view, and pkl checks.
 
 codyW -- 2026-05-24 20:15
 - added a sick 4-graph modal popup on stock viewer, scraped charts from halfgone. zero redirection. simple.
