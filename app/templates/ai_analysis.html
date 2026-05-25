@@ -8,6 +8,68 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
   {% include "navbar.html" %}
-  <p>tab for recieving questions about stocks, AI prompt engineering.</p>
+
+  <div class="max-w-2xl mx-auto px-4 py-10">
+    <h1 class="text-xl font-bold text-gray-800 mb-1">AI Stock Analysis</h1>
+    <p class="text-sm text-gray-500 mb-6">Ask anything about stocks, markets, or companies.</p>
+
+    <div class="flex gap-2 mb-4">
+      <input id="question" type="text" placeholder='e.g. "Why did NVDA rise today?"'
+        class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+      <button id="ask-btn" onclick="askAI()"
+        class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+        Ask
+      </button>
+    </div>
+
+    <div class="flex gap-2 flex-wrap mb-6">
+      <button onclick="setQ('Why did NVDA rise today?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Why did NVDA rise today?</button>
+      <button onclick="setQ('What is the outlook for AAPL?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Outlook for AAPL?</button>
+      <button onclick="setQ('Explain what the S&P 500 is')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">What is the S&P 500?</button>
+      <button onclick="setQ('Is TSLA a good investment right now?')" class="text-xs border border-gray-300 bg-white px-3 py-1 rounded hover:bg-gray-50">Is TSLA a good investment?</button>
+    </div>
+
+    <div id="answer-box" class="hidden bg-white border border-gray-200 rounded p-4 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed"></div>
+    <div id="loading" class="hidden text-sm text-gray-400">Thinking…</div>
+    <div id="error-box" class="hidden text-sm text-red-500 mt-2"></div>
+  </div>
+
+  <script>
+    function setQ(text) {
+      document.getElementById("question").value = text;
+      askAI();
+    }
+
+    async function askAI() {
+      const q = document.getElementById("question").value.trim();
+      if (!q) return;
+
+      document.getElementById("answer-box").classList.add("hidden");
+      document.getElementById("error-box").classList.add("hidden");
+      document.getElementById("loading").classList.remove("hidden");
+
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q })
+      });
+      const data = await res.json();
+
+      document.getElementById("loading").classList.add("hidden");
+
+      if (!res.ok || data.error) {
+        document.getElementById("error-box").textContent = data.error || "Something went wrong.";
+        document.getElementById("error-box").classList.remove("hidden");
+        return;
+      }
+
+      document.getElementById("answer-box").textContent = data.answer;
+      document.getElementById("answer-box").classList.remove("hidden");
+    }
+
+    document.getElementById("question").addEventListener("keydown", e => {
+      if (e.key === "Enter") askAI();
+    });
+  </script>
 </body>
 </html>

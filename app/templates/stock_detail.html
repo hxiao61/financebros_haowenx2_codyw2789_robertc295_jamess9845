@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{ ticker }} — Blossomberg</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  {% include "navbar.html" %}
+
+  <div class="max-w-5xl mx-auto px-4 py-8">
+
+    <div class="flex items-center gap-4 mb-6">
+      <a href="/stockviewer" class="text-sm text-gray-500 hover:text-gray-700">← Back</a>
+      <h1 class="text-2xl font-bold text-gray-800">{{ ticker }}</h1>
+      <span id="badge-change" class="text-sm font-medium px-2 py-1 rounded"></span>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Price</p>
+        <p id="stat-price" class="text-xl font-bold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Change</p>
+        <p id="stat-change" class="text-xl font-bold">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Open</p>
+        <p id="stat-open" class="text-xl font-bold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Volume</p>
+        <p id="stat-vol" class="text-xl font-bold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Day High</p>
+        <p id="stat-high" class="text-xl font-bold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4">
+        <p class="text-xs text-gray-500 mb-1">Day Low</p>
+        <p id="stat-low" class="text-xl font-bold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded shadow p-4 col-span-2">
+        <p class="text-xs text-gray-500 mb-1">Period</p>
+        <div class="flex gap-2 mt-1">
+          <button onclick="loadChart('1mo')" class="period-btn text-xs border border-gray-300 bg-gray-50 px-3 py-1 rounded hover:bg-blue-50 hover:border-blue-400" data-period="1mo">1M</button>
+          <button onclick="loadChart('3mo')" class="period-btn text-xs border border-gray-300 bg-gray-50 px-3 py-1 rounded hover:bg-blue-50 hover:border-blue-400" data-period="3mo">3M</button>
+          <button onclick="loadChart('6mo')" class="period-btn text-xs border border-gray-300 bg-gray-50 px-3 py-1 rounded hover:bg-blue-50 hover:border-blue-400" data-period="6mo">6M</button>
+          <button onclick="loadChart('1y')"  class="period-btn text-xs border border-gray-300 bg-gray-50 px-3 py-1 rounded hover:bg-blue-50 hover:border-blue-400" data-period="1y">1Y</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded shadow p-4">
+      <canvas id="chart" style="height:360px;"></canvas>
+    </div>
+
+  </div>
+
+  <script>
+    const TICKER = "{{ ticker }}";
+    let chart;
+
+    async function loadQuote() {
+      const res = await fetch(`/api/stocks/price?ticker=${TICKER}`);
+      const d = await res.json();
+      if (d.price == null) return;
+
+      document.getElementById("stat-price").textContent = `$${d.price.toFixed(2)}`;
+      document.getElementById("stat-open").textContent  = d.open   != null ? `$${d.open.toFixed(2)}`  : "N/A";
+      document.getElementById("stat-high").textContent  = d.high   != null ? `$${d.high.toFixed(2)}`  : "N/A";
+      document.getElementById("stat-low").textContent   = d.low    != null ? `$${d.low.toFixed(2)}`   : "N/A";
+      document.getElementById("stat-vol").textContent   = d.volume != null ? d.volume.toLocaleString() : "N/A";
+
+      if (d.change_pct != null) {
+        const up = d.change_pct >= 0;
+        const el = document.getElementById("stat-change");
+        el.textContent = `${up ? "▲" : "▼"} ${Math.abs(d.change_pct).toFixed(2)}%`;
+        el.className = `text-xl font-bold ${up ? "text-green-600" : "text-red-600"}`;
+        const badge = document.getElementById("badge-change");
+        badge.textContent = el.textContent;
+        badge.className = `text-sm font-medium px-2 py-1 rounded ${up ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`;
+      }
+    }
+
+    async function loadChart(period) {
+      const res = await fetch(`/api/stocks/history?ticker=${TICKER}&period=${period}`);
+      const d = await res.json();
+      if (d.error || !d.prices) return;
+
+      const isUp = d.prices[d.prices.length - 1] >= d.prices[0];
+      const color = isUp ? "#16a34a" : "#dc2626";
+
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: {
+          labels: d.labels,
+          datasets: [{
+            label: `${TICKER} Close`,
+            data: d.prices,
+            borderColor: color,
+            backgroundColor: isUp ? "rgba(22,163,74,0.08)" : "rgba(220,38,38,0.08)",
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => `$${c.parsed.y.toFixed(2)}` } }
+          },
+          scales: {
+            x: { ticks: { maxRotation: 0, autoSkip: true, color: "#6b7280" }, grid: { color: "#f3f4f6" } },
+            y: { ticks: { color: "#6b7280" }, grid: { color: "#f3f4f6" } }
+          }
+        }
+      });
+    }
+
+    loadQuote();
+    loadChart("6mo");
+  </script>
+</body>
+</html>

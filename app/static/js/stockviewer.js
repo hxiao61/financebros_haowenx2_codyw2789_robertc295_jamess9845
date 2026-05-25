@@ -50,6 +50,46 @@ async function fetchQuote(ticker) {
   }
 }
 
+async function fetchSparkline(ticker) {
+  try {
+    const res = await fetch(`/api/stocks/history?ticker=${ticker}&period=1mo`);
+    const data = await res.json();
+    if (data.error || !data.prices || data.prices.length < 2) return;
+
+    const canvas = document.getElementById(`spark-${ticker}`);
+    if (!canvas) return;
+
+    const prices = data.prices;
+    const isUp = prices[prices.length - 1] >= prices[0];
+    const color = isUp ? "#34d399" : "#f87171";
+
+    new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: data.labels,
+        datasets: [{
+          data: prices,
+          borderColor: color,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.4,
+          fill: true,
+          backgroundColor: isUp ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)",
+        }]
+      },
+      options: {
+        responsive: false,
+        animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        }
+      }
+    });
+  } catch (_) {}
+}
+
 async function loadTopStocks() {
   const body = document.getElementById("stockviewer-body");
   body.innerHTML = "";
@@ -65,13 +105,17 @@ async function loadTopStocks() {
       <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="high-${ticker}">…</td>
       <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="low-${ticker}">…</td>
       <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="vol-${ticker}">…</td>
+      <td class="px-5 py-2">
+        <canvas id="spark-${ticker}" width="120" height="40"></canvas>
+      </td>
       <td class="text-right px-5 py-3">
-        <a href="#" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">View →</a>
+        <a href="/stock/${ticker}" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">View →</a>
       </td>`;
     body.appendChild(row);
   }
 
   await Promise.all(TOP_STOCKS.map(fetchQuote));
+  Promise.all(TOP_STOCKS.map(fetchSparkline));
 
   document.getElementById("last-updated").textContent =
     new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });

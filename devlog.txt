@@ -178,3 +178,15 @@ specifically target new stocks and our current fang stocks that are integrated i
 
 haowenX -- 2026-05-22 11:44
 - Touched shop on to do, arranged meeting time, will update design with new designs.
+
+codyW -- 2026-05-24 19:51
+- finally got the ai analysis page working with openrouter, using nemotron free model which actually goes crazy
+- got the api key situation figured out, old one was dead switched to new one
+- added little sparkline graphs on the side of each stock in the stock viewer (30 day)
+- built a whole stock detail page /stock/<ticker> with the chart and all the critical info like open high low vol etc
+- fixed the view button on stockviewer to actually go somewhere useful
+- added retrain button on the forecast page with a checkingpklfile flag so it doesnt double fire
+- made it show a badge for if the pretrained .pkl is loaded or if its using the default one
+- added endpoints for checking pkl and retraining the model
+- also hardcoded the api key in app.py so we dont have to deal with env stuff
+- variable names are kinda funny now which i think is type shit

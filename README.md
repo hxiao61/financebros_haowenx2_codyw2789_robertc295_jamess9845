@@ -44,13 +44,13 @@ $ venv\Scripts\activate
 $ pip install -r requirements.txt
 ```
 
-Now open on [localhost](http://127.0.0.1:5000)
+Now open on [localhost](http://127.0.0.1:5002)
 
 ## Launch Codes:
 In terminal, access project root directory and run the command:
 
 ```
 ~$ cd app
-~$ python build_db.py
-~$ python app.py
+~$ python3 build_db.py
+~$ python3 app.py
 ```

@@ -3,40 +3,232 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prediction Forecast</title>
+  <title>Prediction Forecast — Blossomberg</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.35s ease both; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen font-sans text-slate-200">
   {% include "navbar.html" %}
 
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <div class="flex flex-wrap items-center gap-3 mb-4">
-      <h2 class="text-xl font-bold text-gray-800">Prediction Demo</h2>
-      <input id="ticker" value="NVDA" maxlength="8"
-             class="border border-gray-300 rounded px-3 py-2 w-28" />
-      <button id="run" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Run
-      </button>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+
+    <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// ml forecast</p>
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">Prediction Demo</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="tickerBox" value="NVDA" maxlength="8"
+               class="bg-slate-800 border border-slate-700 text-slate-100 font-mono text-sm rounded px-3 py-2 w-28 focus:outline-none focus:border-sky-500" />
+        <button id="runBtn" class="bg-sky-600 hover:bg-sky-500 text-white font-mono text-sm px-5 py-2 rounded transition-colors">
+          Run →
+        </button>
+        <button id="retrainBtn" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-mono text-xs px-4 py-2 rounded border border-slate-600 transition-colors">
+          ⟳ Retrain
+        </button>
+      </div>
     </div>
 
-    <div class="mb-3 flex flex-wrap gap-2">
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AAPL">AAPL</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="MSFT">MSFT</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="NVDA">NVDA</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="AMZN">AMZN</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="META">META</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="GOOGL">GOOGL</button>
-      <button class="quick-ticker border border-gray-300 bg-white px-3 py-1 rounded text-sm hover:bg-gray-50" data-ticker="TSLA">TSLA</button>
+    <div class="fade-up mb-5 flex flex-wrap gap-2">
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="AAPL">AAPL</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="MSFT">MSFT</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="NVDA">NVDA</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="AMZN">AMZN</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="META">META</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="GOOGL">GOOGL</button>
+      <button class="qt font-mono text-xs border border-slate-700 bg-slate-800/60 hover:border-sky-500 hover:text-sky-400 text-slate-400 px-3 py-1 rounded transition-colors" data-t="TSLA">TSLA</button>
     </div>
 
-    <div id="meta" class="text-sm text-gray-600 mb-2"></div>
-    <div id="error" class="text-sm text-red-600 mb-2"></div>
-
-    <div class="bg-white rounded shadow p-4">
-      <canvas id="chart" style="height:360px;"></canvas>
+    <div class="flex items-center gap-4 mb-3">
+      <div id="metaLine" class="font-mono text-xs text-slate-400 flex-1 min-h-[1.25rem]"></div>
+      <div id="pklBadge" class="font-mono text-xs px-2 py-1 rounded hidden"></div>
     </div>
+    <div id="errLine" class="font-mono text-xs text-red-400 mb-3"></div>
+
+    <div class="fade-up bg-slate-900 border border-slate-800 rounded-sm p-5">
+      <canvas id="chart" style="height:380px;"></canvas>
+    </div>
+
   </main>
-  <script src="/static/js/demo.js"></script>
+
+  <script>
+    const ctx         = document.getElementById("chart");
+    const tickerBox   = document.getElementById("tickerBox");
+    const runBtn      = document.getElementById("runBtn");
+    const retrainBtn  = document.getElementById("retrainBtn");
+    const metaLine    = document.getElementById("metaLine");
+    const errLine     = document.getElementById("errLine");
+    const pklBadge    = document.getElementById("pklBadge");
+    let bigChart;
+
+    let checkingpklfile = false;
+
+    async function checkPkl(stonk) {
+      const res  = await fetch(`/api/model/check?ticker=${stonk}`);
+      const info = await res.json();
+      pklBadge.classList.remove("hidden");
+      if (info.has_model) {
+        pklBadge.textContent  = `✓ ${stonk}.pkl loaded`;
+        pklBadge.className = "font-mono text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400 border border-emerald-800";
+      } else {
+        pklBadge.textContent  = `⚠ no ${stonk}.pkl — using default`;
+        pklBadge.className = "font-mono text-xs px-2 py-1 rounded bg-amber-900/50 text-amber-400 border border-amber-800";
+      }
+    }
+
+    function buildChart(payload) {
+      if (bigChart) bigChart.destroy();
+      bigChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: payload.labels,
+          datasets: [
+            {
+              label: `${payload.ticker} Actual Open`,
+              data: payload.actual,
+              borderColor: "#38bdf8",
+              backgroundColor: "rgba(56,189,248,0.07)",
+              borderWidth: 1.5,
+              pointRadius: 0,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: `Rolling Predicted`,
+              data: payload.rolling_prediction,
+              borderColor: "#fb923c",
+              borderWidth: 1.5,
+              pointRadius: 0,
+              borderDash: [5, 4],
+              spanGaps: true,
+              tension: 0.25
+            },
+            {
+              label: `Next Open (Pred)`,
+              data: payload.prediction,
+              borderColor: "#34d399",
+              backgroundColor: "#34d399",
+              borderWidth: 2,
+              pointRadius: 6,
+              showLine: true,
+              spanGaps: true,
+              tension: 0.8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 900, easing: "easeOutQuart" },
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { labels: { color: "#94a3b8", font: { family: "'IBM Plex Mono'" } } },
+            tooltip: {
+              backgroundColor: "#0f172a",
+              borderColor: "#1e293b",
+              borderWidth: 1,
+              titleColor: "#94a3b8",
+              bodyColor: "#e2e8f0",
+              callbacks: {
+                label: c => c.parsed.y == null ? "" : `${c.dataset.label}: $${c.parsed.y.toFixed(2)}`
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: "#475569", maxRotation: 0, autoSkip: true, font: { family: "'IBM Plex Mono'", size: 10 } }, grid: { color: "#1e293b" } },
+            y: { ticks: { color: "#475569", font: { family: "'IBM Plex Mono'", size: 10 } }, grid: { color: "#1e293b" } }
+          }
+        }
+      });
+    }
+
+    async function runPrediction() {
+      const stonk = tickerBox.value.trim().toUpperCase() || "NVDA";
+      errLine.textContent  = "";
+      metaLine.textContent = "Loading…";
+      await checkPkl(stonk);
+
+      const res     = await fetch("/api/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticker: stonk })
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        metaLine.textContent = "";
+        errLine.textContent  = payload.error || "Something went wrong.";
+        return;
+      }
+      buildChart(payload);
+      const sign = payload.delta >= 0 ? "+" : "";
+      metaLine.textContent = `${payload.ticker}  last open: $${payload.last_open}  |  predicted next: $${payload.predicted_open}  |  move: ${sign}${payload.delta} (${sign}${payload.delta_pct}%)`;
+    }
+
+    async function doRetrain() {
+      const stonk = tickerBox.value.trim().toUpperCase() || "NVDA";
+      if (checkingpklfile) return;
+      checkingpklfile = true;
+      retrainBtn.textContent   = "⟳ Training…";
+      retrainBtn.disabled      = true;
+      retrainBtn.classList.add("opacity-50");
+
+      try {
+        const res  = await fetch("/api/retrain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ticker: stonk })
+        });
+        const data = await res.json();
+        if (data.done) {
+          retrainBtn.textContent = "✓ Done";
+          await checkPkl(stonk);
+          setTimeout(() => runPrediction(), 400);
+        } else {
+          retrainBtn.textContent = "✗ Failed";
+          errLine.textContent = data.error || "retrain failed";
+        }
+      } catch (uhoh) {
+        retrainBtn.textContent = "✗ Error";
+        errLine.textContent = uhoh.toString();
+      } finally {
+        checkingpklfile = false;
+        setTimeout(() => {
+          retrainBtn.textContent = "⟳ Retrain";
+          retrainBtn.disabled    = false;
+          retrainBtn.classList.remove("opacity-50");
+        }, 2000);
+      }
+    }
+
+    runBtn.addEventListener("click", runPrediction);
+    retrainBtn.addEventListener("click", doRetrain);
+    document.querySelectorAll(".qt").forEach(btn => {
+      btn.addEventListener("click", () => { tickerBox.value = btn.dataset.t; runPrediction(); });
+    });
+    tickerBox.addEventListener("keydown", e => { if (e.key === "Enter") runPrediction(); });
+
+    runPrediction();
+  </script>
 </body>
 </html>
