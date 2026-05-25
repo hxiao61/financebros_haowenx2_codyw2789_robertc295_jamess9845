@@ -275,4 +275,12 @@ window.onload = function () {
   setInterval(tick, 1000);
   loadTopStocks();
   setInterval(loadTopStocks, 2 * 60 * 1000);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetTicker = urlParams.get("ticker");
+  if (targetTicker) {
+    setTimeout(() => {
+      openStockModal(targetTicker.toUpperCase());
+    }, 300);
+  }
 };
