@@ -186,3 +186,13 @@ codyW -- 2026-05-24 19:51
 
 codyW -- 2026-05-24 20:15
 - added a sick 4-graph modal popup on stock viewer, scraped charts from halfgone. zero redirection. simple.
+
+haowenX -- 2026-05-26 2:39
+- added 4 chart grid to stock detail
+- Fixed forecast page
+- moved AI anlysis section, reorganized js files 
+- Deleted stockviewer 2
+- Updated desgin doc but will upload later
+- issues with ai
+- MVP basically finished
+- Fixed CSS
