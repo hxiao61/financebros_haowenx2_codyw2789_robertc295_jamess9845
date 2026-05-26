@@ -45,7 +45,7 @@ This project matters because Bloomberg can be both very overwhelming and expensi
 Features that **must** be completed:
 - Stock data pulling live and historical prices from Yahoo Finance API or cached in SQLite
 - Dashboard with searchable stock tickers, growth charts, comparison graphs, and volume charts using Chart.js
-- ML forecast page using Scikit-learn regression models trained on the FAANG historical dataset. Predicts graphs and has confidence intervals
+- ML forecast page using Scikit-learn regression models trained on the FAANG historical dataset and yfinance. Predicts graphs and has confidence intervals
 - Portfolio / watchlist system letting users save tickers to their account and view their performance
 - AI Analysis panel using OpenRouter that answers questions like "Why did NVDA rise today?"
 
@@ -78,7 +78,7 @@ Features that **must** be completed:
 | ORM / DB Library | N/A |
 | Data Visualization | Chart.js |
 | Machine Learning | Sci-kit-Learn; PyTorch as stretch |
-| Market Data | Kaggle CSV, yFinance, Alpaca (optional) |
+| Market Data | yFinance, Alpaca (optional) |
 | AI | OpenRouter API, OpenAI API |
 
 ## Why This Stack Was Chosen
@@ -257,7 +257,7 @@ As a casual investor managing a personal watchlist, I want to save and organize 
 - Create GitHub repository and organize overall project structure
 - Set up Flask backend framework and routing system
 - Create SQLite database tables and schema
-- Integrate yFinance APIs for live and Kaggle historical stock data
+- Integrate yFinance APIs for live historical stock data
 - Develop login/logout system and authentication flow
 - Design starter dashboard UI using TailwindCSS
 - Set up Flask sessions and backend infrastructure
