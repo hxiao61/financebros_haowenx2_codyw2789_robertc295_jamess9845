@@ -68,7 +68,7 @@
           },
           plugins: {
             legend: {
-              labels: { color: "#212529" }
+              labels: { color: "#FFFF" }
             },
             tooltip: {
               callbacks: {
@@ -78,10 +78,10 @@
           },
           scales: {
             x: {
-              ticks: { color: "#6c757d", maxRotation: 0, autoSkip: true }
+              ticks: { color: "#FFFF", maxRotation: 0, autoSkip: true }
             },
             y: {
-              ticks: { color: "#6c757d" }
+              ticks: { color: "#FFFF" }
             }
           }
         }
