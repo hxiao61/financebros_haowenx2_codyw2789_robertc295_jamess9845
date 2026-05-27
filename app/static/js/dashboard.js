@@ -76,7 +76,7 @@ window.onload = function(){
             <td class="font-mono text-xs text-slate-400 text-right px-5 py-3" id="vol-${ticker}">—</td>
             <td class="text-right px-5 py-3">
           <a
-            href="/stockviewer?ticker=${ticker}"
+            href="/stock/${ticker}"
             class="inline-block font-mono text-xs uppercase tracking-widest px-3 py-1 rounded-sm border border-sky-800 text-sky-400 hover:bg-sky-800/40 transition-colors">
             View →
           </a>
@@ -110,10 +110,10 @@ window.onload = function(){
         const high = document.getElementById(`high-${ticker}`);
         const low = document.getElementById(`low-${ticker}`);
         const volume = document.getElementById(`vol-${ticker}`);
-        if (open) open.textContent = `$${data.open}`;
-        if (high) high.textContent = `$${data.high}`;
-        if (low) low.textContent = `$${data.low}`;
-        if (volume) volume.textContent = data.volume;
+        if (open)   open.textContent   = data.open   != null ? `$${data.open.toFixed(2)}`       : "N/A";
+        if (high)   high.textContent   = data.high   != null ? `$${data.high.toFixed(2)}`       : "N/A";
+        if (low)    low.textContent    = data.low    != null ? `$${data.low.toFixed(2)}`        : "N/A";
+        if (volume) volume.textContent = data.volume != null ? data.volume.toLocaleString()     : "N/A";
 
       } catch (e) { console.error(`Quote error ${ticker}:`, e); }
     }
