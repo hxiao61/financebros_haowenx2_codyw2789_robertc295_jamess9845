@@ -5,8 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-  <script>
+<script>
     tailwind.config = {
       theme: {
         extend: {
@@ -75,34 +74,6 @@
 
   </main>
 
-  <!-- Modal -->
-  <div id="stock-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded p-6 max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h2 id="modal-title" class="font-mono text-xl font-bold text-sky-400"></h2>
-        <button onclick="closeStockModal()" class="font-mono text-slate-400 hover:text-slate-200">Close [X]</button>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-slate-950 p-4 border border-slate-800 rounded">
-          <h3 class="font-mono text-sm text-slate-400 mb-2">Price History (1Y)</h3>
-          <div class="relative h-48"><canvas id="modalPriceChart"></canvas></div>
-        </div>
-        <div class="bg-slate-950 p-4 border border-slate-800 rounded">
-          <h3 class="font-mono text-sm text-slate-400 mb-2">Indexed Growth Comparison</h3>
-          <div class="relative h-48"><canvas id="modalGrowthChart"></canvas></div>
-        </div>
-        <div class="bg-slate-950 p-4 border border-slate-800 rounded">
-          <h3 class="font-mono text-sm text-slate-400 mb-2">Monthly Trading Volume</h3>
-          <div class="relative h-48"><canvas id="modalVolumeChart"></canvas></div>
-        </div>
-        <div class="bg-slate-950 p-4 border border-slate-800 rounded">
-          <h3 class="font-mono text-sm text-slate-400 mb-2">Sharpe Ratio Comparison</h3>
-          <div class="relative h-48"><canvas id="modalSharpeChart"></canvas></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="{{ url_for('static', filename='js/stockviewer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stockviewer.js') }}"></script>
 </body>
 </html>

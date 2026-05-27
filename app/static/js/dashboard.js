@@ -8,21 +8,6 @@ window.onload = function(){
     setInterval(loadMarketSummary, twoMin)
 }
 
-function searchStock() {
-    var searchBox = document.getElementById("navbar-search")
-    var query = searchBox.value
-    query = query.toUpperCase()
-
-    fetch("/api/stocks/search?q=" + query)
-    .then(function(response){
-        return response.json()
-    })
-    .then(function(result){
-        var resultSpan = document.getElementById("search-result")
-        resultSpan.innerText = result.name + "- $" + result.price
-    })
-}
-
     function tick() {
       document.getElementById("clock").textContent =
         new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });

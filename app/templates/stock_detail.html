@@ -25,9 +25,11 @@
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .fade-up { animation: fadeUp 0.35s ease both; }
-    .delay-1 { animation-delay: 0.05s; }
-    .delay-2 { animation-delay: 0.10s; }
+    .fade-up  { animation: fadeUp 0.35s ease both; }
+    .delay-1  { animation-delay: 0.05s; }
+    .delay-2  { animation-delay: 0.10s; }
+    .delay-3  { animation-delay: 0.15s; }
+    .delay-4  { animation-delay: 0.20s; }
   </style>
 </head>
 
@@ -35,81 +37,324 @@
 
   {% include "navbar.html" %}
 
-  <main class="max-w-5xl mx-auto px-6 py-10">
+  <main class="max-w-6xl mx-auto px-6 py-6">
 
     <!-- Header -->
-    <div class="fade-up flex items-center gap-4 border-b border-slate-800 pb-6 mb-8">
-      <a href="/stockviewer" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest">← Back</a>
-      <div>
+    <div class="fade-up flex items-start gap-4 border-b border-slate-800 pb-4 mb-5">
+      <a href="/stockviewer" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest mt-1">← Back</a>
+      <div class="flex-1">
         <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-0.5">// stock detail</p>
-        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">{{ ticker }}</h1>
+        <div class="flex items-center gap-3 flex-wrap">
+          <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">{{ ticker }}</h1>
+          <span id="badge-change" class="font-mono text-xs px-2 py-1 rounded-sm border"></span>
+        </div>
+        <div class="flex items-center gap-4 mt-1 flex-wrap">
+          <p id="company-name" class="font-mono text-xs text-slate-400 uppercase tracking-widest"></p>
+          <p id="company-meta" class="font-mono text-xs text-slate-600 uppercase tracking-widest"></p>
+        </div>
       </div>
-      <span id="badge-change" class="font-mono text-xs px-2 py-1 rounded-sm border"></span>
-    </div>
-
-    <!-- Stat cards -->
-    <div class="fade-up delay-1 grid grid-cols-2 sm:grid-cols-6 gap-4 mb-8">
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3 border-l-2 border-l-sky-500">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Price</p>
-        <p id="stat-price" class="font-mono text-lg font-semibold text-slate-100">—</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Change</p>
-        <p id="stat-change" class="font-mono text-lg font-semibold">—</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Open</p>
-        <p id="stat-open" class="font-mono text-lg font-semibold text-slate-100">—</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Volume</p>
-        <p id="stat-vol" class="font-mono text-lg font-semibold text-slate-100">—</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Day High</p>
-        <p id="stat-high" class="font-mono text-lg font-semibold text-emerald-400">—</p>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm px-4 py-3">
-        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-1">Day Low</p>
-        <p id="stat-low" class="font-mono text-lg font-semibold text-red-400">—</p>
+      <div class="text-right">
+        <p id="analyst-rating" class="font-mono text-xs uppercase tracking-widest px-3 py-1 rounded-sm border border-slate-700 text-slate-500"></p>
+        <p id="analyst-target" class="font-mono text-xs text-slate-600 mt-1"></p>
       </div>
     </div>
 
-    <!-- Charts 2x2 -->
-    <div class="fade-up delay-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
-        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Price History (1Y)</h3>
-        <div class="h-64"><canvas id="priceChart"></canvas></div>
+    <!-- Live quote row -->
+    <div class="fade-up delay-1 grid grid-cols-3 sm:grid-cols-6 gap-2 mb-2">
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2 border-l-2 border-l-sky-500">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Price</p>
+        <p id="stat-price" class="font-mono text-base font-semibold text-slate-100">—</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
-        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Indexed Growth Comparison</h3>
-        <div class="h-64"><canvas id="growthChart"></canvas></div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Change</p>
+        <p id="stat-change" class="font-mono text-base font-semibold">—</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
-        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Monthly Trading Volume</h3>
-        <div class="h-64"><canvas id="volumeChart"></canvas></div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Open</p>
+        <p id="stat-open" class="font-mono text-sm font-semibold text-slate-100">—</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-sm p-5">
-        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Sharpe Ratio Comparison (2Y)</h3>
-        <div class="h-64"><canvas id="sharpeChart"></canvas></div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Volume</p>
+        <p id="stat-vol" class="font-mono text-sm font-semibold text-slate-100">—</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Day High</p>
+        <p id="stat-high" class="font-mono text-sm font-semibold text-emerald-400">—</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Day Low</p>
+        <p id="stat-low" class="font-mono text-sm font-semibold text-red-400">—</p>
       </div>
     </div>
+
+    <!-- 52-week range bar -->
+    <div class="fade-up delay-1 bg-slate-900 border border-slate-800 rounded-sm px-4 py-2 mb-5 flex items-center gap-4">
+      <p id="w52-low"  class="font-mono text-xs text-red-400 w-20 shrink-0">—</p>
+      <div class="flex-1 relative h-1.5 bg-slate-800 rounded-full">
+        <div id="w52-bar" class="absolute left-0 top-0 h-1.5 bg-sky-500 rounded-full" style="width:0%"></div>
+        <div id="w52-dot" class="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-sky-400 rounded-full border-2 border-slate-900" style="left:0%"></div>
+      </div>
+      <p id="w52-high" class="font-mono text-xs text-emerald-400 w-20 shrink-0 text-right">—</p>
+      <p class="font-mono text-xs text-slate-600 uppercase tracking-widest shrink-0">52-week range</p>
+    </div>
+
+    <!-- Two-column: info left, charts right -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-5 items-stretch">
+
+    <!-- Left: info panels -->
+    <div class="lg:col-span-2 space-y-3">
+
+    <!-- Valuation -->
+    <div>
+      <button onclick="toggleSection('valuation')" class="flex items-center gap-2 mb-2 w-full text-left">
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500">// valuation</p>
+        <span id="icon-valuation" class="font-mono text-xs text-sky-600">▼</span>
+      </button>
+      <div id="section-valuation" class="grid grid-cols-2 gap-2">
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Market Cap</p>
+          <p id="v-mktcap"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Enterprise Val</p>
+          <p id="v-ev"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">P/E (TTM)</p>
+          <p id="v-pe"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">P/E (Fwd)</p>
+          <p id="v-fpe"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">PEG Ratio</p>
+          <p id="v-peg"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Price / Book</p>
+          <p id="v-pb"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Price / Sales</p>
+          <p id="v-ps"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">EV / EBITDA</p>
+          <p id="v-evebitda" class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financials -->
+    <div>
+      <button onclick="toggleSection('financials')" class="flex items-center gap-2 mb-2 w-full text-left">
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500">// financials (ttm)</p>
+        <span id="icon-financials" class="font-mono text-xs text-sky-600">▼</span>
+      </button>
+      <div id="section-financials" class="grid grid-cols-2 gap-2">
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Revenue</p>
+          <p id="f-rev"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Net Income</p>
+          <p id="f-ni"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">EBITDA</p>
+          <p id="f-ebitda"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Free Cash Flow</p>
+          <p id="f-fcf"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">EPS (TTM)</p>
+          <p id="f-eps"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">EPS (Fwd)</p>
+          <p id="f-feps"    class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Profit Margin</p>
+          <p id="f-pm"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Operating Margin</p>
+          <p id="f-om"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Gross Margin</p>
+          <p id="f-gm"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">ROE</p>
+          <p id="f-roe"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">ROA</p>
+          <p id="f-roa"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Debt / Equity</p>
+          <p id="f-de"      class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dividends + Analyst + Technical + Ownership -->
+    <div>
+      <button onclick="toggleSection('misc')" class="flex items-center gap-2 mb-2 w-full text-left">
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500">// dividends · analyst · technical · ownership</p>
+        <span id="icon-misc" class="font-mono text-xs text-sky-600">▼</span>
+      </button>
+      <div id="section-misc" class="grid grid-cols-2 gap-2">
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Div Yield</p>
+          <p id="d-yield"   class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Div Rate</p>
+          <p id="d-rate"    class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Payout Ratio</p>
+          <p id="d-payout"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Ex-Div Date</p>
+          <p id="d-exdate"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Analyst Target</p>
+          <p id="a-target"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5"># Analysts</p>
+          <p id="a-count"   class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Beta</p>
+          <p id="t-beta"    class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Short Float</p>
+          <p id="t-short"   class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Avg Volume</p>
+          <p id="t-avgvol"  class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Insider Own</p>
+          <p id="o-insider" class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Inst Own</p>
+          <p id="o-inst"    class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-sm px-3 py-2">
+          <p class="font-mono text-xs uppercase tracking-widest text-slate-600 mb-0.5">Employees</p>
+          <p id="o-emp"     class="font-mono text-sm font-semibold text-slate-200">—</p>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- end left column -->
+
+    <!-- Right: charts -->
+    <div class="lg:col-span-3 flex flex-col gap-6">
+
+    <!-- Price chart -->
+    <div class="bg-slate-900 border border-slate-800 rounded-sm p-4 flex-1 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500">// price history</h3>
+        <div class="flex gap-1.5" id="period-btns">
+          {% for p in ['1mo','3mo','6mo','1y','2y','5y'] %}
+          <button onclick="loadPriceChart('{{ p }}')"
+                  data-period="{{ p }}"
+                  class="period-btn font-mono text-xs px-3 py-1 rounded-sm border transition-colors uppercase tracking-widest
+                         {% if p == '1y' %}bg-sky-700 border-sky-600 text-white{% else %}bg-slate-900 border-slate-700 text-slate-500 hover:border-sky-700 hover:text-sky-400{% endif %}">
+            {{ p }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="relative flex-1 min-h-32"><canvas id="priceChart"></canvas></div>
+    </div>
+
+    <!-- Comparison charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// indexed growth (1y)</h3>
+        <div class="relative h-36">
+          <div id="loading-growth" class="absolute inset-0 flex items-center justify-center">
+            <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
+          </div>
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// monthly volume</h3>
+        <div class="relative h-36">
+          <div id="loading-volume" class="absolute inset-0 flex items-center justify-center">
+            <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
+          </div>
+          <canvas id="volumeChart"></canvas>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// sharpe ratio (2y)</h3>
+        <div class="relative h-36">
+          <div id="loading-sharpe" class="absolute inset-0 flex items-center justify-center">
+            <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
+          </div>
+          <canvas id="sharpeChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- end right column -->
+    </div><!-- end two-column wrapper -->
 
   </main>
 
   <script>
     const TICKER = "{{ ticker }}";
+    let priceChart = null;
+
+    const GRID = "rgba(30, 41, 59, 0.8)";
+    const TICK = "#475569";
+    const FONT = { family: '"IBM Plex Mono"', size: 10 };
+    const baseScales = {
+      x: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT, maxTicksLimit: 8 } },
+      y: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT } }
+    };
+
+    function toggleSection(id) {
+      const grid = document.getElementById(`section-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      const isHidden = grid.classList.toggle("hidden");
+      icon.textContent = isHidden ? "▶" : "▼";
+    }
+
+    const na = v => v != null ? v : "N/A";
+    const pct = v => v != null ? `${v}%` : "N/A";
+    const dol = v => v != null ? `$${v}` : "N/A";
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
     async function loadQuote() {
       const res = await fetch(`/api/stocks/price?ticker=${TICKER}`);
       const d = await res.json();
       if (d.price == null) return;
 
-      document.getElementById("stat-price").textContent = `$${d.price.toFixed(2)}`;
-      document.getElementById("stat-open").textContent  = d.open   != null ? `$${d.open.toFixed(2)}`   : "N/A";
-      document.getElementById("stat-high").textContent  = d.high   != null ? `$${d.high.toFixed(2)}`   : "N/A";
-      document.getElementById("stat-low").textContent   = d.low    != null ? `$${d.low.toFixed(2)}`    : "N/A";
-      document.getElementById("stat-vol").textContent   = d.volume != null ? d.volume.toLocaleString() : "N/A";
+      set("stat-price", `$${d.price.toFixed(2)}`);
+      set("stat-open",  d.open   != null ? `$${d.open.toFixed(2)}`   : "N/A");
+      set("stat-high",  d.high   != null ? `$${d.high.toFixed(2)}`   : "N/A");
+      set("stat-low",   d.low    != null ? `$${d.low.toFixed(2)}`    : "N/A");
+      set("stat-vol",   d.volume != null ? d.volume.toLocaleString() : "N/A");
 
       if (d.change_pct != null) {
         const up = d.change_pct >= 0;
@@ -120,96 +365,225 @@
         badge.textContent = el.textContent;
         badge.className = `font-mono text-xs px-2 py-1 rounded-sm border ${up ? "border-emerald-800 text-emerald-400" : "border-red-800 text-red-400"}`;
       }
+
+      // Update 52w bar with live price
+      updateRangeBar(d.price);
     }
 
-    async function loadAllCharts() {
-      try {
-        const res  = await fetch(`/api/stocks/modal_data?ticker=${TICKER}`);
-        const swag = await res.json();
-        if (swag.error) return;
+    let _week52 = { low: null, high: null };
 
-        const GRID = "rgba(30, 41, 59, 0.8)";
-        const TICK = "#475569";
-        const FONT = { family: '"IBM Plex Mono"', size: 10 };
+    function updateRangeBar(price) {
+      const { low, high } = _week52;
+      if (low == null || high == null || price == null) return;
+      const pct = Math.min(100, Math.max(0, ((price - low) / (high - low)) * 100));
+      document.getElementById("w52-bar").style.width = pct + "%";
+      document.getElementById("w52-dot").style.left  = pct + "%";
+    }
 
-        const baseScales = {
-          x: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT } },
-          y: { grid: { color: GRID }, border: { color: "#1e293b" }, ticks: { color: TICK, font: FONT } }
+    async function loadInfo() {
+      const res = await fetch(`/api/stocks/info?ticker=${TICKER}`);
+      const d = await res.json();
+      if (d.error) return;
+
+      // Header
+      set("company-name", d.name ?? "");
+      const meta = [d.sector, d.industry].filter(Boolean).join(" · ");
+      set("company-meta", meta);
+
+      // Analyst badge in header
+      if (d.analyst_rating) {
+        const ratingColors = {
+          "strong_buy": "border-emerald-600 text-emerald-400",
+          "buy":        "border-emerald-700 text-emerald-500",
+          "hold":       "border-yellow-700 text-yellow-400",
+          "sell":       "border-red-700 text-red-400",
+          "strong_sell":"border-red-600 text-red-400",
         };
+        const el = document.getElementById("analyst-rating");
+        el.textContent = d.analyst_rating.replace("_", " ").toUpperCase();
+        el.className = `font-mono text-xs uppercase tracking-widest px-3 py-1 rounded-sm border ${ratingColors[d.analyst_rating] ?? "border-slate-700 text-slate-500"}`;
+      }
+      set("analyst-target", d.analyst_target != null ? `Target: $${d.analyst_target}` : "");
 
-        // 1. Price History
-        const isUp = swag.price_closes.at(-1) >= swag.price_closes[0];
-        new Chart(document.getElementById("priceChart"), {
-          type: "line",
-          data: {
-            labels: swag.price_labels,
-            datasets: [{ label: `${TICKER} Price`, data: swag.price_closes,
-              borderColor: isUp ? "#10b981" : "#ef4444", borderWidth: 2,
-              pointRadius: 0, tension: 0.1, fill: false }]
-          },
-          options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { ...baseScales,
-              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => "$" + v } }
-            }
-          }
-        });
+      // 52w range bar
+      _week52 = { low: d.week52_low, high: d.week52_high };
+      set("w52-low",  d.week52_low  != null ? `$${d.week52_low}`  : "—");
+      set("w52-high", d.week52_high != null ? `$${d.week52_high}` : "—");
 
-        // 2. Growth Comparison
-        const colors = ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4"];
-        new Chart(document.getElementById("growthChart"), {
-          type: "line",
-          data: {
-            labels: swag.monthly_labels,
-            datasets: swag.growth_datasets.map((ds, i) => ({
-              label: ds.ticker, data: ds.data,
-              borderColor: ds.ticker === TICKER ? "#38bdf8" : colors[i % colors.length],
-              borderWidth: ds.ticker === TICKER ? 3 : 1.5,
-              pointRadius: 0, tension: 0.1, fill: false
-            }))
-          },
-          options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: TICK, font: FONT } } },
-            scales: { ...baseScales,
-              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => v + "%" } }
-            }
-          }
-        });
+      // Valuation
+      set("v-mktcap",   na(d.market_cap));
+      set("v-ev",       na(d.enterprise_value));
+      set("v-pe",       na(d.pe_trailing));
+      set("v-fpe",      na(d.pe_forward));
+      set("v-peg",      na(d.peg_ratio));
+      set("v-pb",       na(d.price_book));
+      set("v-ps",       na(d.price_sales));
+      set("v-evebitda", na(d.ev_ebitda));
 
-        // 3. Monthly Volume
-        new Chart(document.getElementById("volumeChart"), {
-          type: "bar",
-          data: { labels: swag.monthly_labels,
-            datasets: [{ label: "Avg Vol", data: swag.monthly_volume, backgroundColor: "#4f46e5" }]
-          },
-          options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { ...baseScales,
-              y: { ...baseScales.y, ticks: { ...baseScales.y.ticks,
-                callback: v => Intl.NumberFormat("en-US", { notation: "compact" }).format(v) } }
-            }
-          }
-        });
+      // Financials
+      set("f-rev",    na(d.revenue));
+      set("f-ni",     na(d.net_income));
+      set("f-ebitda", na(d.ebitda));
+      set("f-fcf",    na(d.free_cash_flow));
+      set("f-eps",    dol(d.eps_trailing));
+      set("f-feps",   dol(d.eps_forward));
+      set("f-pm",     pct(d.profit_margin));
+      set("f-om",     pct(d.operating_margin));
+      set("f-gm",     pct(d.gross_margin));
+      set("f-roe",    pct(d.roe));
+      set("f-roa",    pct(d.roa));
+      set("f-de",     na(d.debt_equity));
 
-        // 4. Sharpe Ratio
-        new Chart(document.getElementById("sharpeChart"), {
-          type: "bar",
-          data: {
-            labels: swag.sharpe_data.map(d => d.ticker),
-            datasets: [{ label: "Sharpe Ratio", data: swag.sharpe_data.map(d => d.sharpe_ratio),
-              backgroundColor: swag.sharpe_data.map(d => d.ticker === TICKER ? "#10b981" : "#334155") }]
-          },
-          options: { responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: baseScales
-          }
-        });
+      // Dividends
+      set("d-yield",  pct(d.dividend_yield));
+      set("d-rate",   dol(d.dividend_rate));
+      set("d-payout", pct(d.payout_ratio));
+      set("d-exdate", na(d.ex_div_date));
 
-      } catch (err) { console.error(err); }
+      // Analyst
+      set("a-target", dol(d.analyst_target));
+      set("a-count",  na(d.analyst_count));
+
+      // Technical
+      set("t-beta",   na(d.beta));
+      set("t-short",  pct(d.short_float));
+      set("t-avgvol", d.avg_volume != null ? d.avg_volume.toLocaleString() : "N/A");
+
+      // Ownership
+      set("o-insider", pct(d.insider_pct));
+      set("o-inst",    pct(d.inst_pct));
+      set("o-emp",     d.employees != null ? d.employees.toLocaleString() : "N/A");
     }
 
-    loadQuote();
-    loadAllCharts();
+    async function loadPriceChart(period) {
+      document.querySelectorAll(".period-btn").forEach(btn => {
+        const active = btn.dataset.period === period;
+        btn.className = `period-btn font-mono text-xs px-3 py-1 rounded-sm border transition-colors uppercase tracking-widest ${
+          active ? "bg-sky-700 border-sky-600 text-white"
+                 : "bg-slate-900 border-slate-700 text-slate-500 hover:border-sky-700 hover:text-sky-400"
+        }`;
+      });
+
+      const res  = await fetch(`/api/stocks/history?ticker=${TICKER}&period=${period}`);
+      const data = await res.json();
+      if (data.error || !data.prices) return;
+
+      const isUp  = data.prices.at(-1) >= data.prices[0];
+      const color = isUp ? "#10b981" : "#ef4444";
+
+      if (priceChart) { priceChart.destroy(); priceChart = null; }
+
+      priceChart = new Chart(document.getElementById("priceChart"), {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: [{
+            data: data.prices,
+            borderColor: color,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.1,
+            fill: true,
+            backgroundColor: isUp ? "rgba(16,185,129,0.06)" : "rgba(239,68,68,0.06)",
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "#0f172a", borderColor: "#1e293b", borderWidth: 1,
+              titleColor: "#94a3b8", bodyColor: "#e2e8f0",
+              titleFont: FONT, bodyFont: FONT, padding: 10,
+              callbacks: { label: ctx => ` $${ctx.parsed.y.toFixed(2)}` }
+            }
+          },
+          scales: { ...baseScales,
+            y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => "$" + v } }
+          }
+        }
+      });
+    }
+
+    async function loadComparisonCharts() {
+      try {
+      const res  = await fetch(`/api/stocks/modal_data?ticker=${TICKER}`);
+      const swag = await res.json();
+      if (swag.error) {
+        ["growth","volume","sharpe"].forEach(k => {
+          const el = document.getElementById(`loading-${k}`);
+          if (el) el.querySelector("span").textContent = "Unavailable";
+        });
+        return;
+      }
+
+      ["growth","volume","sharpe"].forEach(k => {
+        const el = document.getElementById(`loading-${k}`);
+        if (el) el.classList.add("hidden");
+      });
+
+      const colors = ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4"];
+
+      new Chart(document.getElementById("growthChart"), {
+        type: "line",
+        data: {
+          labels: swag.monthly_labels,
+          datasets: swag.growth_datasets.map((ds, i) => ({
+            label: ds.ticker, data: ds.data,
+            borderColor: ds.ticker === TICKER ? "#38bdf8" : colors[i % colors.length],
+            borderWidth: ds.ticker === TICKER ? 3 : 1.5,
+            pointRadius: 0, tension: 0.1, fill: false
+          }))
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: TICK, font: FONT, boxWidth: 12 } } },
+          scales: { ...baseScales,
+            y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => v + "%" } }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("volumeChart"), {
+        type: "bar",
+        data: { labels: swag.monthly_labels,
+          datasets: [{ label: "Avg Vol", data: swag.monthly_volume, backgroundColor: "#4f46e5" }]
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { ...baseScales,
+            y: { ...baseScales.y, ticks: { ...baseScales.y.ticks,
+              callback: v => Intl.NumberFormat("en-US", { notation: "compact" }).format(v) } }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("sharpeChart"), {
+        type: "bar",
+        data: {
+          labels: swag.sharpe_data.map(d => d.ticker),
+          datasets: [{ label: "Sharpe", data: swag.sharpe_data.map(d => d.sharpe_ratio),
+            backgroundColor: swag.sharpe_data.map(d => d.ticker === TICKER ? "#10b981" : "#334155") }]
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: baseScales
+        }
+      });
+      } catch (e) {
+        ["growth","volume","sharpe"].forEach(k => {
+          const el = document.getElementById(`loading-${k}`);
+          if (el) el.querySelector("span").textContent = "Error loading";
+        });
+      }
+    }
+
+    window.onload = function () {
+      loadQuote();
+      loadInfo();
+      loadPriceChart("1y");
+      loadComparisonCharts();
+    };
   </script>
 </body>
 </html>

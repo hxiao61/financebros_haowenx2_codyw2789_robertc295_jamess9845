@@ -513,6 +513,85 @@ def stonk_modal_data():
     }
     return jsonify(swag_bag)
 
+@app.route("/api/stocks/info")
+@login_required
+def stock_info():
+    from datetime import datetime
+    ticker = request.args.get("ticker", "").upper()
+    try:
+        info = yf.Ticker(ticker).info
+
+        def fmt_big(v):
+            if v is None: return None
+            if v >= 1e12: return f"${v/1e12:.2f}T"
+            if v >= 1e9:  return f"${v/1e9:.2f}B"
+            if v >= 1e6:  return f"${v/1e6:.2f}M"
+            return f"${v:,.0f}"
+
+        def pct(v):
+            return round(v * 100, 2) if v is not None else None
+
+        def r2(v):
+            return round(v, 2) if v is not None else None
+
+        ex_div = info.get("exDividendDate")
+        ex_div_str = datetime.fromtimestamp(ex_div).strftime("%Y-%m-%d") if ex_div else None
+
+        ev = info.get("enterpriseValue")
+        ebitda = info.get("ebitda")
+
+        return jsonify({
+            # identity
+            "name":             info.get("longName"),
+            "sector":           info.get("sector"),
+            "industry":         info.get("industry"),
+            "website":          info.get("website"),
+            "employees":        info.get("fullTimeEmployees"),
+            # valuation
+            "market_cap":       fmt_big(info.get("marketCap")),
+            "enterprise_value": fmt_big(ev),
+            "pe_trailing":      r2(info.get("trailingPE")),
+            "pe_forward":       r2(info.get("forwardPE")),
+            "peg_ratio":        r2(info.get("pegRatio")),
+            "price_book":       r2(info.get("priceToBook")),
+            "price_sales":      r2(info.get("priceToSalesTrailing12Months")),
+            "ev_ebitda":        r2(ev / ebitda) if ev and ebitda else None,
+            # financials
+            "revenue":          fmt_big(info.get("totalRevenue")),
+            "net_income":       fmt_big(info.get("netIncomeToCommon")),
+            "ebitda":           fmt_big(ebitda),
+            "free_cash_flow":   fmt_big(info.get("freeCashflow")),
+            "eps_trailing":     r2(info.get("trailingEps")),
+            "eps_forward":      r2(info.get("forwardEps")),
+            "profit_margin":    pct(info.get("profitMargins")),
+            "operating_margin": pct(info.get("operatingMargins")),
+            "gross_margin":     pct(info.get("grossMargins")),
+            "roe":              pct(info.get("returnOnEquity")),
+            "roa":              pct(info.get("returnOnAssets")),
+            "debt_equity":      r2(info.get("debtToEquity")),
+            # dividends
+            "dividend_yield":   pct(info.get("dividendYield")),
+            "dividend_rate":    r2(info.get("dividendRate")),
+            "payout_ratio":     pct(info.get("payoutRatio")),
+            "ex_div_date":      ex_div_str,
+            # analyst
+            "analyst_rating":   info.get("recommendationKey"),
+            "analyst_target":   r2(info.get("targetMeanPrice")),
+            "analyst_count":    info.get("numberOfAnalystOpinions"),
+            # technical
+            "week52_high":      r2(info.get("fiftyTwoWeekHigh")),
+            "week52_low":       r2(info.get("fiftyTwoWeekLow")),
+            "beta":             r2(info.get("beta")),
+            "short_float":      pct(info.get("shortPercentOfFloat")),
+            "avg_volume":       info.get("averageVolume"),
+            # ownership
+            "insider_pct":      pct(info.get("heldPercentInsiders")),
+            "inst_pct":         pct(info.get("heldPercentInstitutions")),
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
 def get_latest_history(ticker: str):
     hist = yf.Ticker(ticker).history(period="1d", interval="2m")
     if not hist.empty and len(hist) >= 2:

@@ -109,7 +109,7 @@ async function loadTopStocks() {
         <canvas id="spark-${ticker}" width="120" height="40"></canvas>
       </td>
       <td class="text-right px-5 py-3 whitespace-nowrap">
-        <button onclick="openStockModal('${ticker}')" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest whitespace-nowrap">View →</button>
+        <a href="/stock/${ticker}" class="font-mono text-xs text-slate-600 hover:text-sky-400 transition-colors uppercase tracking-widest whitespace-nowrap">View →</a>
       </td>`;
     body.appendChild(row);
   }
@@ -121,166 +121,10 @@ async function loadTopStocks() {
     new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-let modalPriceChart = null;
-let modalGrowthChart = null;
-let modalVolumeChart = null;
-let modalSharpeChart = null;
-
-function closeStockModal() {
-  document.getElementById("stock-modal").classList.add("hidden");
-  if (modalPriceChart) { modalPriceChart.destroy(); modalPriceChart = null; }
-  if (modalGrowthChart) { modalGrowthChart.destroy(); modalGrowthChart = null; }
-  if (modalVolumeChart) { modalVolumeChart.destroy(); modalVolumeChart = null; }
-  if (modalSharpeChart) { modalSharpeChart.destroy(); modalSharpeChart = null; }
-}
-
-async function openStockModal(ticker) {
-  document.getElementById("modal-title").textContent = `Loading metrics for ${ticker}...`;
-  document.getElementById("stock-modal").classList.remove("hidden");
-  
-  try {
-    const res = await fetch(`/api/stocks/modal_data?ticker=${ticker}`);
-    const swag = await res.json();
-    if (swag.error) {
-      document.getElementById("modal-title").textContent = `Error: ${swag.error}`;
-      return;
-    }
-    
-    document.getElementById("modal-title").textContent = `${ticker} — Blossomberg Metrics`;
-
-    // 1. Price History
-    const ctxPrice = document.getElementById("modalPriceChart").getContext("2d");
-    const isUp = swag.price_closes[swag.price_closes.length - 1] >= swag.price_closes[0];
-    const priceColor = isUp ? "#10b981" : "#ef4444";
-    modalPriceChart = new Chart(ctxPrice, {
-      type: "line",
-      data: {
-        labels: swag.price_labels,
-        datasets: [{
-          label: `${ticker} Price`,
-          data: swag.price_closes,
-          borderColor: priceColor,
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0.1,
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8", maxTicksLimit: 10 } },
-          y: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8", callback: v => "$" + v } }
-        }
-      }
-    });
-
-    // 2. Growth Comparison
-    const ctxGrowth = document.getElementById("modalGrowthChart").getContext("2d");
-    const colors = [
-      "#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#06b6d4"
-    ];
-    const growthDatasets = swag.growth_datasets.map((dataset, idx) => {
-      const isSelected = dataset.ticker === ticker;
-      return {
-        label: dataset.ticker,
-        data: dataset.data,
-        borderColor: isSelected ? "#38bdf8" : colors[idx % colors.length],
-        borderWidth: isSelected ? 3 : 1.5,
-        pointRadius: 0,
-        tension: 0.1,
-        fill: false
-      };
-    });
-    modalGrowthChart = new Chart(ctxGrowth, {
-      type: "line",
-      data: {
-        labels: swag.monthly_labels,
-        datasets: growthDatasets
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: "#94a3b8" } } },
-        scales: {
-          x: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8" } },
-          y: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8", callback: v => v + "%" } }
-        }
-      }
-    });
-
-    // 3. Monthly Volume
-    const ctxVolume = document.getElementById("modalVolumeChart").getContext("2d");
-    modalVolumeChart = new Chart(ctxVolume, {
-      type: "bar",
-      data: {
-        labels: swag.monthly_labels,
-        datasets: [{
-          label: "Avg Vol",
-          data: swag.monthly_volume,
-          backgroundColor: "#4f46e5"
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8" } },
-          y: {
-            grid: { color: "#1e293b" },
-            ticks: {
-              color: "#94a3b8",
-              callback: v => Intl.NumberFormat("en-US", { notation: "compact" }).format(v)
-            }
-          }
-        }
-      }
-    });
-
-    // 4. Sharpe Ratio Comparison
-    const ctxSharpe = document.getElementById("modalSharpeChart").getContext("2d");
-    const sharpeLabels = swag.sharpe_data.map(d => d.ticker);
-    const sharpeRatios = swag.sharpe_data.map(d => d.sharpe_ratio);
-    const sharpeColors = swag.sharpe_data.map(d => d.ticker === ticker ? "#34d399" : "#475569");
-    modalSharpeChart = new Chart(ctxSharpe, {
-      type: "bar",
-      data: {
-        labels: sharpeLabels,
-        datasets: [{
-          label: "Sharpe Ratio",
-          data: sharpeRatios,
-          backgroundColor: sharpeColors
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8" } },
-          y: { grid: { color: "#1e293b" }, ticks: { color: "#94a3b8" } }
-        }
-      }
-    });
-  } catch (err) {
-    document.getElementById("modal-title").textContent = `Error loading data: ${err}`;
-  }
-}
-
 window.onload = function () {
   tick();
   setInterval(tick, 1000);
   loadTopStocks();
   setInterval(loadTopStocks, 2 * 60 * 1000);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetTicker = urlParams.get("ticker");
-  if (targetTicker) {
-    setTimeout(() => {
-      openStockModal(targetTicker.toUpperCase());
-    }, 300);
-  }
 };

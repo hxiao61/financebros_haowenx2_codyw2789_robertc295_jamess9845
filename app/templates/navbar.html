@@ -46,3 +46,14 @@
     </div>
   </div>
 </nav>
+<script>
+  function searchStock() {
+    const val = document.getElementById("navbar-search").value.trim().toUpperCase();
+    if (val) window.location.href = "/stock/" + val;
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("navbar-search").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") searchStock();
+    });
+  });
+</script>
