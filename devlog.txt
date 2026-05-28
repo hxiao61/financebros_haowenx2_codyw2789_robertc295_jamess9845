@@ -196,3 +196,8 @@ haowenX -- 2026-05-26 2:39
 - issues with ai
 - MVP basically finished
 - Fixed CSS
+
+haowenX -- 2026-05-28 5:46
+- worked with robert to add more details and information to stock detail
+- moved the stock detail to its own page instead of a pop out
+- Fixed searchbar
