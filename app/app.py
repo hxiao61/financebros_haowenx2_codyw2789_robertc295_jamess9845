@@ -439,79 +439,85 @@ def stonk_modal_data():
     except Exception as oops:
         return jsonify({"error": f"no data for {stonk}: {str(oops)}"}), 400
 
-    dates_bro = [d.strftime("%Y-%m-%d") for d in dat.index]
-    closes_bro = [round(float(p), 2) for p in dat["Close"].tolist()]
+    try:
+        import math
+        dates_bro = [d.strftime("%Y-%m-%d") for d in dat.index]
+        closes_bro = [round(float(p), 2) for p in dat["Close"].tolist()]
 
-    # Resample monthly
-    monthly_stonk = dat.resample("ME").last()
-    m_lbls = monthly_stonk.index.strftime("%b %Y").tolist()
+        # Resample monthly
+        monthly_stonk = dat.resample("ME").last()
+        m_lbls = monthly_stonk.index.strftime("%b %Y").tolist()
 
-    if not monthly_stonk.empty:
-        base_price = monthly_stonk["Close"].iloc[0]
-        stonk_gainz = ((monthly_stonk["Close"] / base_price) * 100).round(2).tolist()
-    else:
-        stonk_gainz = []
+        if not monthly_stonk.empty:
+            base_price = monthly_stonk["Close"].iloc[0]
+            stonk_gainz = ((monthly_stonk["Close"] / base_price) * 100).round(2).tolist()
+        else:
+            stonk_gainz = []
 
-    monthly_vol_dat = dat.resample("ME").mean()
-    big_vol = monthly_vol_dat["Volume"].round(2).tolist() if not monthly_vol_dat.empty else []
+        monthly_vol_dat = dat.resample("ME").mean()
+        big_vol = monthly_vol_dat["Volume"].round(2).tolist() if not monthly_vol_dat.empty else []
 
-    # Sharpe (2y)
-    faang_gang = ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA"]
-    if stonk not in faang_gang:
-        faang_gang.append(stonk)
+        # Sharpe (2y)
+        faang_gang = ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA"]
+        if stonk not in faang_gang:
+            faang_gang.append(stonk)
 
-    sharpe_list = []
-    for f_stonk in faang_gang:
-        try:
-            df_f = get_history_cached(f_stonk, period="2y")
-            closes = df_f["Close"]
-            pct_chg = closes.pct_change().dropna()
-            avg_chg = pct_chg.mean() * 252
-            vol = pct_chg.std() * np.sqrt(252)
-            sharpe_score = (avg_chg - 0.037) / vol if vol > 0 else 0
+        sharpe_list = []
+        for f_stonk in faang_gang:
+            try:
+                df_f = get_history_cached(f_stonk, period="2y")
+                closes = df_f["Close"]
+                pct_chg = closes.pct_change().dropna()
+                avg_chg = pct_chg.mean() * 252
+                vol = pct_chg.std() * np.sqrt(252)
+                sharpe_score = (avg_chg - 0.037) / vol if vol > 0 else 0
 
-            sharpe_list.append({
-                "ticker": f_stonk,
-                "sharpe_ratio": round(sharpe_score, 3),
-                "annual_return": round(avg_chg * 100, 2),
-                "annual_volatility": round(vol * 100, 2),
-            })
-        except Exception:
-            continue
-
-    sharpe_list.sort(key=lambda x: x["sharpe_ratio"], reverse=True)
-
-    # Indexed growth comparison
-    compare_gainz = []
-    seen_tickers = set()
-    for f_stonk in ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", stonk]:
-        if f_stonk in seen_tickers:
-            continue
-        seen_tickers.add(f_stonk)
-        try:
-            df_f = get_history_cached(f_stonk, period="1y")
-            m_df = df_f.resample("ME").last()
-            if not m_df.empty:
-                b_price = m_df["Close"].iloc[0]
-                indexed = ((m_df["Close"] / b_price) * 100).round(2).tolist()
-                compare_gainz.append({
+                if math.isnan(sharpe_score) or math.isnan(avg_chg) or math.isnan(vol):
+                    continue
+                sharpe_list.append({
                     "ticker": f_stonk,
-                    "data": indexed
+                    "sharpe_ratio": round(sharpe_score, 3),
+                    "annual_return": round(avg_chg * 100, 2),
+                    "annual_volatility": round(vol * 100, 2),
                 })
-        except Exception:
-            continue
+            except Exception:
+                continue
 
-    swag_bag = {
-        "ticker": stonk,
-        "price_labels": dates_bro,
-        "price_closes": closes_bro,
-        "monthly_labels": m_lbls,
-        "ticker_growth": stonk_gainz,
-        "monthly_volume": big_vol,
-        "sharpe_data": sharpe_list,
-        "growth_datasets": compare_gainz
-    }
-    return jsonify(swag_bag)
+        sharpe_list.sort(key=lambda x: x["sharpe_ratio"], reverse=True)
+
+        # Indexed growth comparison
+        compare_gainz = []
+        seen_tickers = set()
+        for f_stonk in ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", stonk]:
+            if f_stonk in seen_tickers:
+                continue
+            seen_tickers.add(f_stonk)
+            try:
+                df_f = get_history_cached(f_stonk, period="1y")
+                m_df = df_f.resample("ME").last()
+                if not m_df.empty:
+                    b_price = m_df["Close"].iloc[0]
+                    indexed = ((m_df["Close"] / b_price) * 100).round(2).tolist()
+                    compare_gainz.append({
+                        "ticker": f_stonk,
+                        "data": indexed
+                    })
+            except Exception:
+                continue
+
+        swag_bag = {
+            "ticker": stonk,
+            "price_labels": dates_bro,
+            "price_closes": closes_bro,
+            "monthly_labels": m_lbls,
+            "ticker_growth": stonk_gainz,
+            "monthly_volume": big_vol,
+            "sharpe_data": sharpe_list,
+            "growth_datasets": compare_gainz
+        }
+        return jsonify(swag_bag)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/stocks/info")
 @login_required
@@ -731,7 +737,6 @@ def portfolio_remove():
     ticker = str(data.get("ticker", "")).strip().upper()
     remove_from_portfolio(get_user_id(session["user"]), ticker)
     return jsonify({"status": "removed", "ticker": ticker})
-
 
 init_db_full()
 

@@ -110,6 +110,40 @@ def init_db_full():
         )
     """)
 
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS paper_balance (
+            user_id INTEGER PRIMARY KEY,
+            cash    REAL NOT NULL DEFAULT 100000.0,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS paper_holdings (
+            id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id  INTEGER NOT NULL,
+            ticker   TEXT NOT NULL,
+            shares   REAL NOT NULL DEFAULT 0,
+            avg_cost REAL NOT NULL DEFAULT 0,
+            UNIQUE(user_id, ticker),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS paper_transactions (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id    INTEGER NOT NULL,
+            ticker     TEXT NOT NULL,
+            action     TEXT NOT NULL,
+            shares     REAL NOT NULL,
+            price      REAL NOT NULL,
+            total      REAL NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -288,6 +322,125 @@ def remove_from_portfolio(user_id: int, ticker: str):
     conn.execute(
         "DELETE FROM portfolio WHERE user_id = ? AND ticker = ?",
         (user_id, ticker),
+    )
+    conn.commit()
+    conn.close()
+
+
+# PAPER TRADING HELPERS
+
+
+def get_paper_balance(user_id: int) -> float:
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT OR IGNORE INTO paper_balance (user_id, cash) VALUES (?, 100000.0)",
+        (user_id,),
+    )
+    conn.commit()
+    row = conn.execute(
+        "SELECT cash FROM paper_balance WHERE user_id = ?", (user_id,)
+    ).fetchone()
+    conn.close()
+    return row["cash"]
+
+
+def set_paper_balance(user_id: int, cash: float):
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT OR REPLACE INTO paper_balance (user_id, cash) VALUES (?, ?)",
+        (user_id, cash),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_paper_holdings(user_id: int):
+    conn = get_db_connection()
+    rows = conn.execute(
+        "SELECT ticker, shares, avg_cost FROM paper_holdings WHERE user_id = ? ORDER BY ticker",
+        (user_id,),
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def paper_buy(user_id: int, ticker: str, shares: float, price: float):
+    conn = get_db_connection()
+    existing = conn.execute(
+        "SELECT shares, avg_cost FROM paper_holdings WHERE user_id = ? AND ticker = ?",
+        (user_id, ticker),
+    ).fetchone()
+    if existing:
+        new_shares = existing["shares"] + shares
+        new_avg = (existing["shares"] * existing["avg_cost"] + shares * price) / new_shares
+        conn.execute(
+            "UPDATE paper_holdings SET shares = ?, avg_cost = ? WHERE user_id = ? AND ticker = ?",
+            (new_shares, new_avg, user_id, ticker),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO paper_holdings (user_id, ticker, shares, avg_cost) VALUES (?, ?, ?, ?)",
+            (user_id, ticker, shares, price),
+        )
+    conn.commit()
+    conn.close()
+
+
+def paper_sell(user_id: int, ticker: str, shares: float) -> bool:
+    conn = get_db_connection()
+    existing = conn.execute(
+        "SELECT shares, avg_cost FROM paper_holdings WHERE user_id = ? AND ticker = ?",
+        (user_id, ticker),
+    ).fetchone()
+    if not existing or existing["shares"] < shares:
+        conn.close()
+        return False
+    new_shares = existing["shares"] - shares
+    if new_shares < 0.0001:
+        conn.execute(
+            "DELETE FROM paper_holdings WHERE user_id = ? AND ticker = ?",
+            (user_id, ticker),
+        )
+    else:
+        conn.execute(
+            "UPDATE paper_holdings SET shares = ? WHERE user_id = ? AND ticker = ?",
+            (new_shares, user_id, ticker),
+        )
+    conn.commit()
+    conn.close()
+    return True
+
+
+def add_paper_transaction(user_id: int, ticker: str, action: str,
+                          shares: float, price: float, total: float):
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO paper_transactions (user_id, ticker, action, shares, price, total) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, ticker, action, shares, price, total),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_paper_transactions(user_id: int, limit: int = 50):
+    conn = get_db_connection()
+    rows = conn.execute(
+        "SELECT ticker, action, shares, price, total, created_at "
+        "FROM paper_transactions WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+        (user_id, limit),
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def reset_paper_portfolio(user_id: int):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM paper_holdings WHERE user_id = ?", (user_id,))
+    conn.execute("DELETE FROM paper_transactions WHERE user_id = ?", (user_id,))
+    conn.execute(
+        "INSERT OR REPLACE INTO paper_balance (user_id, cash) VALUES (?, 100000.0)",
+        (user_id,),
     )
     conn.commit()
     conn.close()
