@@ -48,15 +48,16 @@ def get_history_cached(ticker: str, period: str = "6mo"):
     """Check SQLite cache first; fall back to yFinance and write back on miss."""
     import pandas as pd
 
-    period_days = {"1mo": 30, "3mo": 90, "6mo": 180, "1y": 365, "2y": 730}
+    period_days = {"1mo": 30, "3mo": 90, "6mo": 180, "1y": 365, "2y": 730, "5y": 1825}
     days  = period_days.get(period, 180)
     since = (datetime.date.today() - datetime.timedelta(days=days)).strftime("%Y-%m-%d")
 
     cached = get_cached_rows(ticker, since)
     if cached:
         latest_cached = cached[-1]["date"]
+        oldest_cached = cached[0]["date"]
         yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-        if latest_cached >= yesterday:
+        if latest_cached >= yesterday and oldest_cached <= since:
             df = pd.DataFrame([dict(r) for r in cached])
             df = df.rename(columns={
                 "open": "Open", "high": "High", "low": "Low",
@@ -454,7 +455,7 @@ def stonk_modal_data():
         else:
             stonk_gainz = []
 
-        monthly_vol_dat = dat.resample("ME").mean()
+        monthly_vol_dat = dat.resample("ME").mean(numeric_only=True)
         big_vol = monthly_vol_dat["Volume"].round(2).tolist() if not monthly_vol_dat.empty else []
 
         # Sharpe (2y)
