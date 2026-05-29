@@ -201,3 +201,9 @@ haowenX -- 2026-05-28 5:46
 - worked with robert to add more details and information to stock detail
 - moved the stock detail to its own page instead of a pop out
 - Fixed searchbar
+
+haowenX -- 2026-05-29 4:15
+- Worked with robert to fix the three graphs
+- Added 5 year into dictionary because it was displaying 6 months
+- Added latest_cached to fix errors
+- Working on paper trading, base in app.py
