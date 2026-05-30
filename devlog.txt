@@ -179,6 +179,9 @@ specifically target new stocks and our current fang stocks that are integrated i
 haowenX -- 2026-05-22 11:44
 - Touched shop on to do, arranged meeting time, will update design with new designs.
 
+jamesS -- 2026-05-23 21:36
+fixed the demo function by updating the "predict" function to call api/predict, moved demo.html to forecast.html, updated navbar to reflect changes
+
 codyW -- 2026-05-24 19:51
 - ai analysis live. free model goes crazy.
 - hardcoded openrouter key to bypass env issues.
