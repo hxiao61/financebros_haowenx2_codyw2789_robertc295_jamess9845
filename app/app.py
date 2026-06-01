@@ -24,6 +24,14 @@ from build_db import (
     get_portfolio,
     upsert_portfolio,
     remove_from_portfolio,
+    get_paper_balance,
+    set_paper_balance,
+    get_paper_holdings,
+    paper_buy,
+    paper_sell,
+    add_paper_transaction,
+    get_paper_transactions,
+    reset_paper_portfolio,
 )
 
 app = Flask(__name__)
@@ -738,6 +746,176 @@ def portfolio_remove():
     ticker = str(data.get("ticker", "")).strip().upper()
     remove_from_portfolio(get_user_id(session["user"]), ticker)
     return jsonify({"status": "removed", "ticker": ticker})
+
+# ---------------------------------------------------------------
+# PAPER TRADING
+# ---------------------------------------------------------------
+
+@app.route("/paper")
+@login_required
+def paper_trading():
+    return render_template("paper_trading.html", user=session["user"], active="paper")
+
+
+@app.route("/api/paper/state")
+@login_required
+def paper_state():
+    user_id = get_user_id(session["user"])
+    cash = get_paper_balance(user_id)
+    raw_holdings = get_paper_holdings(user_id)
+    raw_txns = get_paper_transactions(user_id, limit=50)
+
+    holdings = []
+    total_mkt = 0.0
+    total_cost = 0.0
+    for h in raw_holdings:
+        try:
+            fi = yf.Ticker(h["ticker"]).fast_info
+            price = fi.last_price
+        except Exception:
+            price = None
+
+        cost = h["shares"] * h["avg_cost"]
+        mkt = h["shares"] * price if price is not None else None
+        gl = (mkt - cost) if mkt is not None else None
+        gl_pct = (gl / cost * 100) if (gl is not None and cost) else None
+
+        if mkt:
+            total_mkt += mkt
+        total_cost += cost
+
+        holdings.append({
+            "ticker":    h["ticker"],
+            "shares":    h["shares"],
+            "avg_cost":  round(h["avg_cost"], 4),
+            "cur_price": round(price, 2) if price is not None else None,
+            "mkt_value": round(mkt, 2) if mkt is not None else None,
+            "gain_loss": round(gl, 2) if gl is not None else None,
+            "gain_pct":  round(gl_pct, 2) if gl_pct is not None else None,
+        })
+
+    transactions = [
+        {
+            "ticker":     t["ticker"],
+            "action":     t["action"],
+            "shares":     t["shares"],
+            "price":      t["price"],
+            "total":      t["total"],
+            "created_at": t["created_at"],
+        }
+        for t in raw_txns
+    ]
+
+    total_equity = cash + total_mkt
+    total_gl = total_equity - (100000.0)
+
+    return jsonify({
+        "cash":         round(cash, 2),
+        "holdings":     holdings,
+        "transactions": transactions,
+        "total_mkt":    round(total_mkt, 2),
+        "total_equity": round(total_equity, 2),
+        "total_gl":     round(total_gl, 2),
+        "total_gl_pct": round(total_gl / 100000.0 * 100, 2),
+    })
+
+
+@app.route("/api/paper/buy", methods=["POST"])
+@login_required
+def paper_trade_buy():
+    data = request.get_json(silent=True) or {}
+    ticker = str(data.get("ticker", "")).strip().upper()
+    shares = data.get("shares")
+
+    if not ticker or not ticker.replace(".", "").isalnum() or len(ticker) > 10:
+        return jsonify({"error": "Invalid ticker"}), 400
+    try:
+        shares = float(shares)
+        assert shares > 0
+    except Exception:
+        return jsonify({"error": "shares must be a positive number"}), 400
+
+    try:
+        fi = yf.Ticker(ticker).fast_info
+        price = fi.last_price
+        if price is None:
+            raise ValueError("no price")
+        price = float(price)
+    except Exception:
+        return jsonify({"error": f"Could not get price for {ticker}"}), 400
+
+    total = shares * price
+    user_id = get_user_id(session["user"])
+    cash = get_paper_balance(user_id)
+
+    if total > cash:
+        return jsonify({"error": f"Insufficient funds — need ${total:,.2f}, have ${cash:,.2f}"}), 400
+
+    set_paper_balance(user_id, cash - total)
+    paper_buy(user_id, ticker, shares, price)
+    add_paper_transaction(user_id, ticker, "BUY", shares, price, total)
+
+    return jsonify({
+        "status": "ok",
+        "ticker": ticker,
+        "shares": shares,
+        "price":  round(price, 4),
+        "total":  round(total, 2),
+        "cash":   round(cash - total, 2),
+    })
+
+
+@app.route("/api/paper/sell", methods=["POST"])
+@login_required
+def paper_trade_sell():
+    data = request.get_json(silent=True) or {}
+    ticker = str(data.get("ticker", "")).strip().upper()
+    shares = data.get("shares")
+
+    if not ticker or not ticker.replace(".", "").isalnum() or len(ticker) > 10:
+        return jsonify({"error": "Invalid ticker"}), 400
+    try:
+        shares = float(shares)
+        assert shares > 0
+    except Exception:
+        return jsonify({"error": "shares must be a positive number"}), 400
+
+    try:
+        fi = yf.Ticker(ticker).fast_info
+        price = fi.last_price
+        if price is None:
+            raise ValueError("no price")
+        price = float(price)
+    except Exception:
+        return jsonify({"error": f"Could not get price for {ticker}"}), 400
+
+    user_id = get_user_id(session["user"])
+    ok = paper_sell(user_id, ticker, shares)
+    if not ok:
+        return jsonify({"error": f"Not enough shares of {ticker}"}), 400
+
+    total = shares * price
+    cash = get_paper_balance(user_id)
+    set_paper_balance(user_id, cash + total)
+    add_paper_transaction(user_id, ticker, "SELL", shares, price, total)
+
+    return jsonify({
+        "status": "ok",
+        "ticker": ticker,
+        "shares": shares,
+        "price":  round(price, 4),
+        "total":  round(total, 2),
+        "cash":   round(cash + total, 2),
+    })
+
+
+@app.route("/api/paper/reset", methods=["POST"])
+@login_required
+def paper_reset():
+    user_id = get_user_id(session["user"])
+    reset_paper_portfolio(user_id)
+    return jsonify({"status": "reset", "cash": 100000.0})
+
 
 init_db_full()
 
