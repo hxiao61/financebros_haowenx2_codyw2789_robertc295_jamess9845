@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Paper Trading — Blossomberg</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #060d1b; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up  { animation: fadeUp 0.35s ease both; }
+    .delay-1  { animation-delay: 0.05s; }
+    .delay-2  { animation-delay: 0.10s; }
+    .delay-3  { animation-delay: 0.15s; }
+    .delay-4  { animation-delay: 0.20s; }
+    tr:hover td { background-color: rgba(14, 36, 71, 0.45); }
+  </style>
+</head>
+
+<body class="min-h-screen font-sans text-slate-200">
+
+  {% include "navbar.html" %}
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+
+    <!-- Header -->
+    <div class="fade-up flex items-end justify-between border-b border-slate-800 pb-6 mb-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-sky-500 mb-1">// paper trading</p>
+        <h1 class="font-mono text-2xl font-semibold text-slate-100 tracking-wide">Paper Portfolio</h1>
+        <p class="text-sm text-slate-500 mt-1.5">Simulated trades with $100,000 starting cash. No real money involved.</p>
+      </div>
+      <button onclick="confirmReset()"
+              class="font-mono text-xs uppercase tracking-widest text-slate-600 hover:text-red-400 transition-colors border border-slate-800 hover:border-red-900 px-3 py-2 rounded-sm">
+        Reset Portfolio
+      </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="fade-up delay-1 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-sky-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">Cash</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="stat-cash">—</p>
+      </div>
+      <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-violet-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">Holdings Value</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="stat-mkt">—</p>
+      </div>
+      <div class="fade-up delay-3 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-emerald-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">Total Equity</p>
+        <p class="font-mono text-xl font-semibold text-slate-100" id="stat-equity">—</p>
+      </div>
+      <div class="fade-up delay-4 bg-slate-900 border border-slate-800 rounded-sm border-l-2 border-l-amber-500 px-5 py-4">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-2">Total P&L</p>
+        <p class="font-mono text-xl font-semibold" id="stat-gl">—</p>
+        <p class="font-mono text-xs text-slate-600 mt-1" id="stat-gl-pct">—</p>
+      </div>
+    </div>
+
+    <!-- Trade Form -->
+    <div class="fade-up delay-2 bg-slate-900 border border-slate-800 rounded-sm px-6 py-5 mb-8">
+      <p class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-4">Execute Trade</p>
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="font-mono text-xs text-slate-600 uppercase tracking-widest">Ticker</label>
+          <input id="trade-ticker" type="text" placeholder="AAPL" maxlength="10"
+                 class="bg-slate-950 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-sm text-slate-200 px-3 py-2 w-28 uppercase tracking-widest outline-none transition-colors">
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="font-mono text-xs text-slate-600 uppercase tracking-widest">Shares</label>
+          <input id="trade-shares" type="number" placeholder="10" min="0.001" step="any"
+                 class="bg-slate-950 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-sm text-slate-200 px-3 py-2 w-28 outline-none transition-colors">
+        </div>
+        <button onclick="executeTrade('BUY')"
+                class="bg-emerald-800 hover:bg-emerald-700 active:bg-emerald-900 text-white font-mono text-xs uppercase tracking-widest px-5 py-2 rounded-sm transition-colors">
+          Buy
+        </button>
+        <button onclick="executeTrade('SELL')"
+                class="bg-red-900 hover:bg-red-800 active:bg-red-950 text-white font-mono text-xs uppercase tracking-widest px-5 py-2 rounded-sm transition-colors">
+          Sell
+        </button>
+        <p id="trade-msg" class="font-mono text-xs text-slate-500 ml-2"></p>
+      </div>
+    </div>
+
+    <!-- Holdings Table -->
+    <div class="fade-up delay-3 mb-8">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+        <h2 class="font-mono text-xs uppercase tracking-widest text-slate-500">Holdings</h2>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-800 bg-slate-950/60">
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3">Ticker</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Shares</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Avg Cost</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Price</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Mkt Value</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">P&L</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">P&L %</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Sell All</th>
+            </tr>
+          </thead>
+          <tbody id="holdings-body">
+            <tr>
+              <td colspan="8" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
+                No holdings yet — place a buy order above
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="fade-up delay-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block"></span>
+        <h2 class="font-mono text-xs uppercase tracking-widest text-slate-500">Recent Transactions</h2>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-sm overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-800 bg-slate-950/60">
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3">Date</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3">Action</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-left px-5 py-3">Ticker</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Shares</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Price</th>
+              <th class="font-mono text-xs uppercase tracking-widest text-slate-600 text-right px-5 py-3">Total</th>
+            </tr>
+          </thead>
+          <tbody id="txn-body">
+            <tr>
+              <td colspan="6" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">
+                No transactions yet
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function fmt(n) {
+  if (n == null) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtShares(n) {
+  if (n == null) return '—';
+  return parseFloat(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+}
+
+function glClass(n) {
+  if (n == null) return 'text-slate-400';
+  return n >= 0 ? 'text-emerald-400' : 'text-red-400';
+}
+
+async function loadState() {
+  const res = await fetch('/api/paper/state');
+  const d = await res.json();
+
+  $('stat-cash').textContent   = fmt(d.cash);
+  $('stat-mkt').textContent    = fmt(d.total_mkt);
+  $('stat-equity').textContent = fmt(d.total_equity);
+
+  const glEl  = $('stat-gl');
+  const glPct = $('stat-gl-pct');
+  glEl.textContent  = (d.total_gl >= 0 ? '+' : '') + fmt(d.total_gl);
+  glEl.className    = 'font-mono text-xl font-semibold ' + glClass(d.total_gl);
+  glPct.textContent = (d.total_gl_pct >= 0 ? '+' : '') + d.total_gl_pct + '%';
+
+  // Holdings
+  const hBody = $('holdings-body');
+  if (d.holdings.length === 0) {
+    hBody.innerHTML = `<tr><td colspan="8" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">No holdings yet — place a buy order above</td></tr>`;
+  } else {
+    hBody.innerHTML = d.holdings.map(h => `
+      <tr>
+        <td class="font-mono text-sm text-slate-200 px-5 py-3 font-semibold">
+          <a href="/stock/${h.ticker}" class="hover:text-sky-400 transition-colors">${h.ticker}</a>
+        </td>
+        <td class="font-mono text-sm text-slate-300 text-right px-5 py-3">${fmtShares(h.shares)}</td>
+        <td class="font-mono text-sm text-slate-400 text-right px-5 py-3">${fmt(h.avg_cost)}</td>
+        <td class="font-mono text-sm text-slate-300 text-right px-5 py-3">${h.cur_price != null ? fmt(h.cur_price) : '—'}</td>
+        <td class="font-mono text-sm text-slate-300 text-right px-5 py-3">${fmt(h.mkt_value)}</td>
+        <td class="font-mono text-sm text-right px-5 py-3 ${glClass(h.gain_loss)}">${h.gain_loss != null ? (h.gain_loss >= 0 ? '+' : '') + fmt(h.gain_loss) : '—'}</td>
+        <td class="font-mono text-sm text-right px-5 py-3 ${glClass(h.gain_pct)}">${h.gain_pct != null ? (h.gain_pct >= 0 ? '+' : '') + h.gain_pct + '%' : '—'}</td>
+        <td class="text-right px-5 py-3">
+          <button onclick="sellAll('${h.ticker}', ${h.shares})"
+                  class="font-mono text-xs uppercase tracking-widest text-slate-600 hover:text-red-400 transition-colors">
+            Sell All
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Transactions
+  const tBody = $('txn-body');
+  if (d.transactions.length === 0) {
+    tBody.innerHTML = `<tr><td colspan="6" class="font-mono text-xs text-slate-700 text-center py-10 tracking-widest uppercase">No transactions yet</td></tr>`;
+  } else {
+    tBody.innerHTML = d.transactions.map(t => `
+      <tr>
+        <td class="font-mono text-xs text-slate-500 px-5 py-2.5">${t.created_at}</td>
+        <td class="font-mono text-xs uppercase tracking-widest px-5 py-2.5 ${t.action === 'BUY' ? 'text-emerald-400' : 'text-red-400'}">${t.action}</td>
+        <td class="font-mono text-sm text-slate-200 px-5 py-2.5 font-semibold">${t.ticker}</td>
+        <td class="font-mono text-sm text-slate-300 text-right px-5 py-2.5">${fmtShares(t.shares)}</td>
+        <td class="font-mono text-sm text-slate-400 text-right px-5 py-2.5">${fmt(t.price)}</td>
+        <td class="font-mono text-sm text-slate-300 text-right px-5 py-2.5">${fmt(t.total)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+async function executeTrade(action) {
+  const ticker = $('trade-ticker').value.trim().toUpperCase();
+  const shares = $('trade-shares').value;
+  const msgEl  = $('trade-msg');
+
+  if (!ticker || !shares) {
+    msgEl.textContent = 'Enter a ticker and share count.';
+    msgEl.className   = 'font-mono text-xs text-amber-400 ml-2';
+    return;
+  }
+
+  msgEl.textContent = 'Processing…';
+  msgEl.className   = 'font-mono text-xs text-slate-500 ml-2';
+
+  const endpoint = action === 'BUY' ? '/api/paper/buy' : '/api/paper/sell';
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ticker, shares: parseFloat(shares) }),
+  });
+  const d = await res.json();
+
+  if (d.error) {
+    msgEl.textContent = d.error;
+    msgEl.className   = 'font-mono text-xs text-red-400 ml-2';
+  } else {
+    const sign = action === 'BUY' ? 'Bought' : 'Sold';
+    msgEl.textContent = `${sign} ${fmtShares(d.shares)} ${d.ticker} @ ${fmt(d.price)}`;
+    msgEl.className   = 'font-mono text-xs text-emerald-400 ml-2';
+    $('trade-ticker').value = '';
+    $('trade-shares').value = '';
+    loadState();
+  }
+}
+
+async function sellAll(ticker, shares) {
+  const msgEl = $('trade-msg');
+  msgEl.textContent = `Selling all ${ticker}…`;
+  msgEl.className   = 'font-mono text-xs text-slate-500 ml-2';
+
+  const res = await fetch('/api/paper/sell', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ticker, shares }),
+  });
+  const d = await res.json();
+
+  if (d.error) {
+    msgEl.textContent = d.error;
+    msgEl.className   = 'font-mono text-xs text-red-400 ml-2';
+  } else {
+    msgEl.textContent = `Sold all ${ticker}`;
+    msgEl.className   = 'font-mono text-xs text-emerald-400 ml-2';
+    loadState();
+  }
+}
+
+async function confirmReset() {
+  if (!confirm('Reset your paper portfolio to $100,000 cash? This cannot be undone.')) return;
+  await fetch('/api/paper/reset', { method: 'POST' });
+  $('trade-msg').textContent = 'Portfolio reset.';
+  $('trade-msg').className   = 'font-mono text-xs text-sky-400 ml-2';
+  loadState();
+}
+
+loadState();
+</script>
+
+</body>
+</html>
