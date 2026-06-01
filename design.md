@@ -48,10 +48,12 @@ Features that **must** be completed:
 - ML forecast page using Scikit-learn regression models trained on the FAANG historical dataset and yfinance. Predicts graphs and has confidence intervals
 - Portfolio / watchlist system letting users save tickers to their account and view their performance
 - AI Analysis panel using OpenRouter that answers questions like "Why did NVDA rise today?"
+- Stock viewer page (/stockviewer): table of top 15 stocks showing live price, change %, open, high, low, volume, and 30-day charts
+- Stock detail page: Gives all important data about a specific stock such as their valuation, financials, dividends, analyst ratings, etc with a extended graph and Sharpe ratio comparison.
+- Simulated portfolio with paper trading: start with $100,000 cash and buy/sell semi-live yfinance prices with transaction history and portfolio reset
 
 ## Stretch Features (Only if MVP is Complete)
 - Candlestick and line graphs
-- Simulated portfolio with paper trading
 - Sector and index heatmap
 - Email/alert system for prices
 
@@ -77,9 +79,9 @@ Features that **must** be completed:
 | Authentication | Flask sessions |
 | ORM / DB Library | N/A |
 | Data Visualization | Chart.js |
-| Machine Learning | Sci-kit-Learn; PyTorch as stretch |
-| Market Data | yFinance, Alpaca (optional) |
-| AI | OpenRouter API, OpenAI API |
+| Machine Learning | Sci-kit-Learn |
+| Market Data | yFinance |
+| AI | OpenRouter API|
 
 ## Why This Stack Was Chosen
 
@@ -145,7 +147,7 @@ As a casual investor managing a personal watchlist, I want to save and organize 
 | INTEGER | User_id | Links to user id |
 | TEXT | Ticker | Saved stock ticker |
 
-### stock_cashe
+### stock_cache
 
 | Type | Field | Description |
 |---|---|---|
@@ -189,6 +191,36 @@ As a casual investor managing a personal watchlist, I want to save and organize 
 | DATE | prediction_date | Date prediction was made |
 | DATE | target_date | Date was being predicted |
 | REAL | predicted_price | ML-predicted stock price |
+
+### paper_balance
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | user_id | Links to users.id |
+| REAL | cash | Current cash balance (default $100,000) |
+
+### paper_holdings
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique holding ID |
+| INTEGER | user_id | Links to users.id |
+| TEXT | ticker | Stock ticker |
+| REAL | shares | Shares currently held |
+| REAL | avg_cost | Weighted average purchase price |
+
+### paper_transactions
+
+| TYPE | FIELD | DESCRIPTION |
+|---|---|---|
+| INTEGER PRIMARY KEY | id | Unique transaction ID |
+| INTEGER | user_id | Links to users.id |
+| TEXT | ticker | Stock ticker |
+| TEXT | action | BUY or SELL |
+| REAL | shares | Shares traded |
+| REAL | price | Price per share at execution |
+| REAL | total | Total dollar value |
+| DATETIME | created_at | Timestamp of trade (UTC for now) |
 
 ---
 
@@ -303,7 +335,7 @@ As a casual investor managing a personal watchlist, I want to save and organize 
 Project is considered complete when all of the following are true:
 - All MVP features (auth, dashboard, stock viewer, forecast, portfolio/watchlist, AI analysis, relevant equations) are implemented and reachable by navbar
 - Frontend, Flask backend, and SQLite database are fully integrated
-- ML forecast page returns predictions for any of the FAANG tickers with a confidence interval
+- ML forecast page returns predictions for any of the FAANG tickers
 - AI Analysis returns a LLM-generated response to at least 3 test prompts
 - App served on financebros.app
 
@@ -313,9 +345,12 @@ Project is considered complete when all of the following are true:
 
 - Do we want OpenRouter to call a specific LLM by default or allow users to choose between different models?
 - Should ML forecasts predict only next-day prices or support multi-day forecasting?
+A: next-day only
 - Do we want cached stock data to refresh automatically on a timer or only when requested?
+A: refresh AND timer
 - Should the watchlist and portfolio system support simulated profit/loss tracking?
 - Do we want to support candlestick charts if the MVP is completed early?
+A: No candlesticks, line chart only
 - Should AI analysis responses include links/news sources or only generated summaries?
 - Do we want guest access without login for basic stock searching and charts?
 - How much historical stock data should be stored locally in SQLite before clearing old cache entries?
