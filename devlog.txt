@@ -193,7 +193,7 @@ codyW -- 2026-05-24 20:15
 haowenX -- 2026-05-26 2:39
 - added 4 chart grid to stock detail
 - Fixed forecast page
-- moved AI anlysis section, reorganized js files 
+- moved AI anlysis section, reorganized js files
 - Deleted stockviewer 2
 - Updated desgin doc but will upload later
 - issues with ai
@@ -212,7 +212,7 @@ haowenX -- 2026-05-29 4:15
 - Working on paper trading, base in app.py
 
 haowenX -- 2026-06-01 00:10
-- Robert added in paper trading 
+- Robert added in paper trading
 - Moved paper trading js for organization
 - Fixed Design doc
 
@@ -227,4 +227,7 @@ DEVELOPER PREVIEWS: The Aftermath:
 - Fix AI Analysis as it is not providing a response
 - Put more features in Forecast such as sliding window on the prediction to get more data on the prediction,
 as well as perchance predicting what the next week price will be based on the data provided.
-- More details such as whether or not the market was open 
+- More details such as whether or not the market was open
+
+haowenX -- 2026-06-02 11:39
+- Renamed stocks to trending to avoid confusion as suggested by HojPoj
