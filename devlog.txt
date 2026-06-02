@@ -210,3 +210,21 @@ haowenX -- 2026-05-29 4:15
 - Added 5 year into dictionary because it was displaying 6 months
 - Added latest_cached to fix errors
 - Working on paper trading, base in app.py
+
+haowenX -- 2026-06-01 00:10
+- Robert added in paper trading 
+- Moved paper trading js for organization
+- Fixed Design doc
+
+haowenX -- 2026-06-01 02:10
+- Worked with group to redesign design doc to better fit things from fdbk
+- Robert has internet issues but worked on graphs as well as search with me
+- Implemented a clickable/hoverable graph with numbers
+
+DEVELOPER PREVIEWS: The Aftermath:
+- Add search by company name as people don't know ticker
+- Add a more interactable graph to see price better
+- Fix AI Analysis as it is not providing a response
+- Put more features in Forecast such as sliding window on the prediction to get more data on the prediction,
+as well as perchance predicting what the next week price will be based on the data provided.
+- More details such as whether or not the market was open 
