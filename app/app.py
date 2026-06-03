@@ -413,6 +413,11 @@ def stock_price():
             "open": None, "high": None, "low": None, "volume": None,
         })
 
+@app.route("/api/stocks/searchname")
+@login_required
+def name_search():
+    name = yf.Search(query).query
+    # https://ranaroussi.github.io/yfinance/reference/api/yfinance.Search.html
 
 @app.route("/api/stocks/search")
 @login_required
@@ -633,7 +638,7 @@ def get_latest_history(ticker: str):
     if not month_hist.empty and len(month_hist)>= 2:
         return month_hist
     return None
-        
+
 # WATCHLIST
 
 
