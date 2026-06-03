@@ -231,3 +231,9 @@ as well as perchance predicting what the next week price will be based on the da
 
 haowenX -- 2026-06-02 11:39
 - Renamed stocks to trending to avoid confusion as suggested by HojPoj
+
+codyW -- 2026-06-03 9:21
+- Fixed Haowen's broken api key checked it
+- confirmed AI analysis works with an open router key
+- Made fallbacks to 3 other free models(Checked their dates too)
+
