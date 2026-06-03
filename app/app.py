@@ -37,7 +37,7 @@ from build_db import (
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "financebros")
 
-OPENROUTER_KEY = "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"
+OPENROUTER_KEY = "your-openrouter-api-key-here"  # get one free at openrouter.ai/keys
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "proto" / "stock_model.pkl"
@@ -226,21 +226,38 @@ def ai_query():
     if not bigq:
         return jsonify({"error": "No question provided"}), 400
 
+    FREE_MODELS = [
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
+    ]
+
     try:
-        resp = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": "nvidia/nemotron-3-super-120b-a12b:free",
-                "messages": [
-                    {"role": "system", "content": "You are a concise financial analyst. Answer stock market questions clearly and briefly."},
-                    {"role": "user", "content": bigq}
-                ]
-            },
-            timeout=30
-        )
-        resp.raise_for_status()
-        brainResponse = resp.json()["choices"][0]["message"]["content"].strip()
+        brainResponse = None
+        last_err = None
+        for model_id in FREE_MODELS:
+            try:
+                resp = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"},
+                    json={
+                        "model": model_id,
+                        "messages": [
+                            {"role": "system", "content": "You are a concise financial analyst. Answer stock market questions clearly and briefly."},
+                            {"role": "user", "content": bigq}
+                        ]
+                    },
+                    timeout=30
+                )
+                resp.raise_for_status()
+                brainResponse = resp.json()["choices"][0]["message"]["content"].strip()
+                break
+            except Exception as e:
+                last_err = e
+                continue
+
+        if brainResponse is None:
+            raise last_err
 
         conn = get_db_connection()
         conn.execute(
@@ -253,6 +270,7 @@ def ai_query():
         return jsonify({"answer": brainResponse})
     except Exception as oopsie:
         return jsonify({"error": str(oopsie)}), 500
+
 
 @app.route("/stockviewer")
 @login_required
