@@ -237,3 +237,6 @@ codyW -- 2026-06-03 9:21
 - confirmed AI analysis works with an open router key
 - Made fallbacks to 3 other free models(Checked their dates too)
 
+haowenX -- 2026-06-03 11:48
+- Deleted old files that have no use
+- Looked and researched how to use yfinance search to search for name instead of the ticker as suggested
