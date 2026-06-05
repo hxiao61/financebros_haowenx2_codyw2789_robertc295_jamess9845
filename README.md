@@ -10,7 +10,7 @@
 Blossomberg Terminal is a simpled-down and modernized clone of the Bloomberg Terminal that uses live stock data, charts, and ML forecasting with an AI analysis layer for market exploration and learning. The real Bloomberg Terminal costs almost $25,000 / year and has a UI that was built in the 1980s that is very intimidating for beginners. Retail traders and students who want to learn can use this to learn more about stocks and other features of the stock market before deciding if they need a full Bloomberg terminal.
 
 ## Live Site:
-Our program is hosted live [here](http://financebros.app)
+Our program is hosted live [financebros.app](http://financebros.app) OR [138.197.98.11])(https://138.197.98.117)
 
 ### FEATURE SPOTLIGHT
 * Search any stock ticker and view live and historical price charts
