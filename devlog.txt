@@ -240,3 +240,7 @@ codyW -- 2026-06-03 9:21
 haowenX -- 2026-06-03 11:48
 - Deleted old files that have no use
 - Looked and researched how to use yfinance search to search for name instead of the ticker as suggested
+
+jamesS -- 2026-06-05 11:42
+- Updated model prediction weights of pkl files and added new ones for
+INTC(Intel), MU(Micron), and QQQ(S&P 500)
