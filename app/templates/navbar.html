@@ -33,13 +33,18 @@
       </a>
 
       <div class="flex items-center gap-2">
-        <input id="navbar-search" type="text" placeholder="Search ticker…"
-               class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-xs text-slate-200 px-3 py-1.5 w-36 uppercase tracking-widest outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600">
+        <div class="relative">
+          <input id="navbar-search" type="text" placeholder="Ticker or company…"
+                 autocomplete="off"
+                 class="bg-slate-900 border border-slate-700 focus:border-sky-600 rounded-sm font-mono text-xs text-slate-200 px-3 py-1.5 w-48 tracking-widest outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600">
+          <!-- dropdown for company name search results -->
+          <div id="search-dropdown" class="hidden absolute top-full left-0 mt-1 bg-slate-950 border border-slate-700 rounded-sm z-50 shadow-xl min-w-full">
+          </div>
+        </div>
         <button onclick="searchStock()"
                 class="font-mono text-xs uppercase tracking-widest text-slate-500 hover:text-sky-400 transition-colors px-2 py-1.5">
           Go
         </button>
-        <span id="search-result" class="font-mono text-xs text-slate-400"></span>
       </div>
 
       <span class="font-mono text-xs text-slate-600 uppercase tracking-widest">{{ user }}</span>
@@ -53,12 +58,71 @@
 </nav>
 <script>
   function searchStock() {
-    const val = document.getElementById("navbar-search").value.trim().toUpperCase();
+    var val = document.getElementById("navbar-search").value.trim().toUpperCase();
     if (val) window.location.href = "/stock/" + val;
   }
+
   document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("navbar-search").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") searchStock();
+    var searchInput = document.getElementById("navbar-search");
+    var dropdown    = document.getElementById("search-dropdown");
+    var searchTimer = null;
+
+    searchInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter")  { dropdown.classList.add("hidden"); searchStock(); }
+      if (e.key === "Escape") { dropdown.classList.add("hidden"); }
+    });
+
+    // search as you type - wait 300ms after the user stops typing so we dont spam the api
+    searchInput.addEventListener("input", function (e) {
+      clearTimeout(searchTimer);
+      var query = e.target.value.trim();
+      if (query.length < 2) { dropdown.classList.add("hidden"); return; }
+
+      searchTimer = setTimeout(async function () {
+        try {
+          var res  = await fetch("/api/stocks/searchname?q=" + encodeURIComponent(query));
+          var data = await res.json();
+          if (!data.results || data.results.length === 0) {
+            dropdown.classList.add("hidden");
+            return;
+          }
+
+          dropdown.innerHTML = "";
+          for (var result of data.results) {
+            var item = document.createElement("div");
+            item.className = "px-3 py-2 cursor-pointer hover:bg-slate-800 border-b border-slate-800/50 last:border-b-0 flex items-center gap-2";
+
+            var tickerSpan = document.createElement("span");
+            tickerSpan.className = "font-mono text-xs text-sky-400 shrink-0 w-14";
+            tickerSpan.textContent = result.ticker;
+
+            var nameSpan = document.createElement("span");
+            nameSpan.className = "font-mono text-xs text-slate-500 truncate";
+            nameSpan.textContent = result.name;
+
+            item.appendChild(tickerSpan);
+            item.appendChild(nameSpan);
+
+            // use an IIFE so the ticker variable is captured correctly per loop iteration
+            ;(function (t) {
+              item.addEventListener("click", function () {
+                dropdown.classList.add("hidden");
+                window.location.href = "/stock/" + t;
+              });
+            })(result.ticker);
+
+            dropdown.appendChild(item);
+          }
+          dropdown.classList.remove("hidden");
+        } catch (e) { console.error("search error:", e); }
+      }, 300);
+    });
+
+    // close dropdown when clicking anywhere outside the search box
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest("#navbar-search") && !e.target.closest("#search-dropdown")) {
+        dropdown.classList.add("hidden");
+      }
     });
   });
 </script>

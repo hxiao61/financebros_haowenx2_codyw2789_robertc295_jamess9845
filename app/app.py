@@ -214,6 +214,25 @@ def get_dashboard_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/market/status")
+@login_required
+def market_status():
+    # check if NYSE is open right now (9:30am - 4:00pm ET, weekdays only)
+    et = pytz.timezone("America/New_York")
+    now_et = datetime.datetime.now(et)
+
+    is_weekday = now_et.weekday() < 5  # 0=Mon ... 4=Fri, 5=Sat, 6=Sun
+
+    open_time  = now_et.replace(hour=9,  minute=30, second=0, microsecond=0)
+    close_time = now_et.replace(hour=16, minute=0,  second=0, microsecond=0)
+
+    market_is_open = is_weekday and open_time <= now_et <= close_time
+
+    return jsonify({
+        "is_open":  market_is_open,
+        "time_et":  now_et.strftime("%I:%M:%S %p"),
+    })
+
 @app.route("/aianalysis")
 @login_required
 def aianalysis():
@@ -417,8 +436,22 @@ def stock_price():
 @app.route("/api/stocks/searchname")
 @login_required
 def name_search():
-    name = yf.Search(query).query
-    # https://ranaroussi.github.io/yfinance/reference/api/yfinance.Search.html
+    # search for stocks by company name or ticker symbol - way better than just tickers
+    query = request.args.get("q", "").strip()
+    if not query:
+        return jsonify({"results": []})
+    try:
+        search_obj = yf.Search(query, news_count=0, max_results=6)
+        quotes = getattr(search_obj, "quotes", []) or []
+        results = []
+        for q in quotes[:6]:
+            ticker_sym = q.get("symbol", "")
+            company_name = q.get("longname") or q.get("shortname") or ticker_sym
+            if ticker_sym:
+                results.append({"ticker": ticker_sym, "name": company_name})
+        return jsonify({"results": results})
+    except Exception as e:
+        return jsonify({"results": [], "error": str(e)})
 
 @app.route("/api/stocks/search")
 @login_required

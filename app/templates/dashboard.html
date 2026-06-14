@@ -55,8 +55,12 @@
         </p>
       </div>
       <div class="text-right">
-        <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-0.5">Market Time</p>
+        <p class="font-mono text-xs text-slate-600 uppercase tracking-widest mb-0.5">Market Time (EST)</p>
         <p class="font-mono text-sm text-slate-400" id="clock">--:--:--</p>
+        <div class="flex items-center justify-end gap-1.5 mt-1">
+          <span id="market-dot" class="w-2 h-2 rounded-full bg-slate-700 inline-block"></span>
+          <span id="market-text" class="font-mono text-xs text-slate-600 uppercase tracking-widest">checking…</span>
+        </div>
         <p class="font-mono text-xs text-slate-600 mt-0.5" id="last-updated">—</p>
       </div>
     </div>

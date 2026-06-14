@@ -269,7 +269,7 @@
 
     <!-- Price chart -->
     <div class="bg-slate-900 border border-slate-800 rounded-sm p-4 flex-1 flex flex-col">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between mb-2">
         <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500">// price history</h3>
         <div class="flex gap-1.5" id="period-btns">
           {% for p in ['1mo','3mo','6mo','1y','2y','5y'] %}
@@ -282,23 +282,33 @@
           {% endfor %}
         </div>
       </div>
+      <!-- shows the price when you click a point on the chart -->
+      <div class="flex items-center gap-3 mb-2 h-5">
+        <span id="price-clicked-date" class="font-mono text-xs text-slate-600"></span>
+        <span id="price-clicked-val" class="font-mono text-sm text-sky-300 font-medium"></span>
+      </div>
       <div class="relative flex-1 min-h-32"><canvas id="priceChart"></canvas></div>
     </div>
 
-    <!-- Comparison charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
-        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// indexed growth (1y)</h3>
-        <div class="relative h-36">
-          <div id="loading-growth" class="absolute inset-0 flex items-center justify-center">
-            <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
-          </div>
-          <canvas id="growthChart"></canvas>
-        </div>
+    <!-- Expanded indexed growth chart - full width so you can actually see the lines -->
+    <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500">// indexed growth vs big tech (1y)</h3>
+        <p class="font-mono text-xs text-slate-700">hover to compare · base = 100</p>
       </div>
+      <div class="relative h-56">
+        <div id="loading-growth" class="absolute inset-0 flex items-center justify-center">
+          <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
+        </div>
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Volume + Sharpe side by side below the growth chart -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
       <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
         <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// monthly volume</h3>
-        <div class="relative h-36">
+        <div class="relative h-40">
           <div id="loading-volume" class="absolute inset-0 flex items-center justify-center">
             <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
           </div>
@@ -307,7 +317,7 @@
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-sm p-4">
         <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-3">// sharpe ratio (2y)</h3>
-        <div class="relative h-36">
+        <div class="relative h-40">
           <div id="loading-sharpe" class="absolute inset-0 flex items-center justify-center">
             <span class="font-mono text-xs text-slate-700 uppercase tracking-widest animate-pulse">Loading…</span>
           </div>
@@ -490,6 +500,15 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          // clicking a point on the chart shows the exact date + price above it
+          onClick: function(event, elements) {
+            if (elements.length > 0) {
+              var idx = elements[0].index;
+              document.getElementById("price-clicked-date").textContent = data.labels[idx];
+              document.getElementById("price-clicked-val").textContent  = "$" + data.prices[idx].toFixed(2);
+            }
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -536,8 +555,19 @@
             pointRadius: 0, tension: 0.1, fill: false
           }))
         },
-        options: { responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: TICK, font: FONT, boxWidth: 12 } } },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { labels: { color: TICK, font: FONT, boxWidth: 12 } },
+            tooltip: {
+              backgroundColor: "#0f172a", borderColor: "#1e293b", borderWidth: 1,
+              titleColor: "#94a3b8", bodyColor: "#e2e8f0",
+              titleFont: FONT, bodyFont: FONT, padding: 10,
+              callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` }
+            }
+          },
           scales: { ...baseScales,
             y: { ...baseScales.y, ticks: { ...baseScales.y.ticks, callback: v => v + "%" } }
           }
