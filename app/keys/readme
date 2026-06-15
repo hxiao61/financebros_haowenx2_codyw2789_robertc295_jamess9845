@@ -1,0 +1,7 @@
+OpenRouter API
+Website: https://openrouter.ai/
+API that does the following:
+- Routes requests to AI models
+- Prompt engineered to be a finance analyst
+- Real time web scraping to pull sources and information
+This is how we get the responses from AI Analysis
