@@ -255,6 +255,18 @@ def ai_query():
         "meta-llama/llama-3.2-3b-instruct:free",
     ]
 
+    # Give the model the current date so it can reason about "today", and turn on
+    # OpenRouter's web plugin so it can fetch live, current-day information instead
+    # of answering purely from stale training data.
+    et = pytz.timezone("America/New_York")
+    today_str = datetime.datetime.now(et).strftime("%A, %B %d, %Y")
+    system_prompt = (
+        "You are a concise financial analyst. Answer stock market questions clearly and briefly. "
+        f"Today's date is {today_str} (US/Eastern). "
+        "Web search results are provided to you — use them to ground answers in current, "
+        "up-to-date information and cite figures or events from them when relevant."
+    )
+
     try:
         brainResponse = None
         last_err = None
@@ -265,12 +277,15 @@ def ai_query():
                     headers={"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"},
                     json={
                         "model": model_id,
+                        # OpenRouter web plugin: fetches live web results and injects
+                        # them into the prompt so the model can reference current-day info.
+                        "plugins": [{"id": "web", "max_results": 5}],
                         "messages": [
-                            {"role": "system", "content": "You are a concise financial analyst. Answer stock market questions clearly and briefly."},
+                            {"role": "system", "content": system_prompt},
                             {"role": "user", "content": bigq}
                         ]
                     },
-                    timeout=30
+                    timeout=60
                 )
                 resp.raise_for_status()
                 brainResponse = resp.json()["choices"][0]["message"]["content"].strip()
