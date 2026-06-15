@@ -10,6 +10,9 @@ import os
 import datetime
 import requests
 import pytz
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from build_db import (
     get_db_connection,
@@ -38,7 +41,7 @@ from build_db import (
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "financebros")
 
-OPENROUTER_KEY = "your-openrouter-api-key-here"  # get one free at openrouter.ai/keys
+OPENROUTER_KEY = os.environ.get("OPENROUTER_KEY", "")  # set in .env — get one free at openrouter.ai/keys
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "proto" / "stock_model.pkl"
