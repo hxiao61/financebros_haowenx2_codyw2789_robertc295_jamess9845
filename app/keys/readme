@@ -4,4 +4,5 @@ API that does the following:
 - Routes requests to AI models
 - Prompt engineered to be a finance analyst
 - Real time web scraping to pull sources and information
+- Pulls from nemotron and if not available, falls back to another free model. If anything, it will generate error. Do not have to worry about credit use
 This is how we get the responses from AI Analysis
